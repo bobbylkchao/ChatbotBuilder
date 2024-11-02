@@ -12,3 +12,25 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum ERole {
+  SUPERADMIN
+  ADMIN
+  OPERATOR
+  VIEWER
+
+  @@map("role_enum")
+}
+
+model User {
+  id         String       @id @default(uuid()) @map("user_id")
+  email      String       @unique @map("user_email")
+  name       String?      @map("user_name")
+  openid     String       @map("open_id")
+  role       ERole        @default(VIEWER) @map("role_name")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @map("updated_at")
+
+  @@unique(fields: [email, openid], name: "user_email_openid")
+  @@map("users")
+}
