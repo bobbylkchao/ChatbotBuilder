@@ -1,18 +1,11 @@
+import { config } from 'dotenv'
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import { GraphQLError } from 'graphql'
 import { typeDefs } from './schema'
 import { resolvers } from './resolver'
 
-const books = [
-  {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
-  },
-  {
-    title: 'City of Glass',
-    author: 'Paul Auster',
-  },
-]
+config()
 
 const server = new ApolloServer({
   typeDefs,
@@ -22,11 +15,17 @@ const server = new ApolloServer({
 
 const { url } = await startStandaloneServer(server, {
   listen: { port: 4000 },
-  context: async ({ req }) => {
-    // TODO: auth
-    const auth = req?.headers?.authorization || '';
-    //return { user: getUserFromAuth(auth) };
-    return { user: null }
+  context: async ({ req, res }) => {
+    const authToken = req?.headers?.authorization || ''
+    if (!authToken) {
+      throw new GraphQLError('User is not authenticated', {
+        extensions: {
+          code: 'UNAUTHENTICATED',
+          http: { status: 401 },
+        }
+      })
+    }
+    return { authToken }
   }
 })
 
