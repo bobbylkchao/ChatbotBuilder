@@ -12,6 +12,6 @@ The goal is to create a low-code and configurable generative AI-based chat bot.
 
 ## Screenshot
 
-![Login](master/doc/images/1.png)
+![Login](/doc/images/1.png)
 
-![ChatBot](master/doc/images/2.png)
+![ChatBot](/doc/images/2.png)
