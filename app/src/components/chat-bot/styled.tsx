@@ -10,7 +10,6 @@ export const ChatContainer = styled.div`
   border: 0;
   overflow: hidden;
   background-color: #ffffff;
-  padding-bottom: 20px;
 `
 
 export const ChatDisplay = styled.div`
@@ -63,6 +62,7 @@ export const ChatInputContainer = styled.div`
   padding: 0 20px;
   align-items: center;
   justify-content: center;
+  margin-bottom: 20px;
 `
 
 export const InputField = styled.input`
