@@ -1,6 +1,6 @@
 export const config = {
   APP_NAME: 'Blueprint AI',
-  APP_DESC: 'Opensource Low-code AI chat bot generator',
+  APP_DESC: 'Low-code platform for building configurable AI chatbots.',
   APP_REPO: 'https://github.com/bobbylkchao/blueprint',
   API_GRAPHQL_URL: 'http://localhost:4000/graphql',
   API_CHAT_STREAM_URL: 'http://localhost:4000/chat',
