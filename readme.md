@@ -12,7 +12,7 @@ The goal is to create a low-code, configurable platform for creating generative 
 
 ## Screenshot
 
-![Login](/doc/images/1.png)
+![Login](/doc/images/1-1.png)
 
 ![ChatBot Testing](/doc/images/4.png)
 
