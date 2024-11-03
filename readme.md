@@ -2,7 +2,7 @@
 
 ## Goal
 
-The goal is to create a low-code and configurable generative AI-based chat bot.
+The goal is to create a low-code, configurable platform for creating generative AI-based chatbots.
 
 
 ## Slack Community
