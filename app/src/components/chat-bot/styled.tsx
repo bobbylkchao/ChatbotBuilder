@@ -23,37 +23,53 @@ export const ChatDisplay = styled.div`
   overflow-y: scroll;
 `
 
-export const MessageItem = styled.div<{ who: 'bot' | 'human' }>`
+export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>`
   display: flex;
   margin: 8px 0;
-  justify-content: ${(props) => (props.who === 'human' ? 'right' : 'left')};
+  justify-content: ${(props) => (props.role === 'user' ? 'right' : 'left')};
   text-align: left;
   color: ${themeConfig.primary};
-  width: 100%;
 
-  div.message {
+  >div {
     display: flex;
-    width: auto;
     flex-direction: column;
-    min-width: 40%;
-
-    p:first-child {
-      color: ${themeConfig.textColor.primary};
-      border-radius: 10px;
-      padding: 20px 10px;
-      margin: 0;
-      background-color: ${(props) => (
-        props.who === 'human' ? `${themeConfig.primary}` : `${themeConfig.backgroundColor.xLighter}`
-      )};
-    }
   }
 
   p.timestamp {
+    display: flex;
     color: ${themeConfig.textColor.contrast};
     margin: 5px 0 0 0;
     text-align: ${(props) => (
-      props.who === 'human' ? 'right' : 'left'
+      props.role === 'user' ? 'right' : 'left'
     )};
+  }
+
+  div.message {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    color: ${(props) => (
+      props.role === 'user' ? `${themeConfig.textColor.primary}` : `${themeConfig.textColor.lighter}`
+    )};
+    border-radius: 10px;
+    padding: 20px 10px;
+    margin: 0;
+    background-color: ${(props) => (
+      props.role === 'user' ? `${themeConfig.primary}` : `${themeConfig.backgroundColor.xxLighter}`
+    )};
+    border: 1px solid ${(props) => (
+      props.role === 'user' ? `${themeConfig.primary}` : `${themeConfig.border.primary}`
+    )};
+
+    p {
+      margin: ${(props) => (
+        props.role === 'user' || props.role === 'system' ? 0 : '10px 0'
+      )};
+    }
+
+    h1,h2,h3,h4,h5,ol,ul,li {
+      margin: 10px 0;
+    }
   }
 `
 

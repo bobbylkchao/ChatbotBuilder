@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { prisma } from '../prisma-client'
+import { prisma } from '../../misc/prisma-client'
 
 export const getUser = async (openId: string, email: string) => {
   try {

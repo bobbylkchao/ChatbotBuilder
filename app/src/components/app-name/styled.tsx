@@ -6,7 +6,7 @@ export const AppNameWrapper = styled.div`
   display: flex;
   justify-content: left;
   font-weight: bold;
-  border-bottom: 1px solid ${themeConfig.borderColor};
+  border-bottom: 1px solid ${themeConfig.border.lighter};
   padding: 20px 0;
   font-size: ${themeConfig.textSize.large};
   margin: 0 20px;

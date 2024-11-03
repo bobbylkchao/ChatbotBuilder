@@ -15,6 +15,19 @@ export const auth = async (authToken: string) => {
       throw unAuthenticatedError
     }
 
+    // local development via Apollo Studio
+    if (authToken === 'development') {
+      return {
+        email: 'test@test.com',
+        name: 'Test',
+        id: '3c3dba18-029c-4662-8ea1-612e2f261cfd',
+        openid: '123456789',
+        role: 'VIEWER',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    }
+
     const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: {
         Authorization: authToken,

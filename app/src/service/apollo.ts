@@ -15,7 +15,7 @@ interface IApolloContextHeaders {
 }
 
 const httpLink = createHttpLink({
-  uri: config.API_URL,
+  uri: config.API_GRAPHQL_URL,
 })
 
 const authLink = setContext((_, { headers }) => {
