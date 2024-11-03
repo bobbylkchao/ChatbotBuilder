@@ -1,32 +1,37 @@
+import express from 'express'
+import cors from 'cors'
 import { config } from 'dotenv'
-import { ApolloServer } from '@apollo/server'
-import { startStandaloneServer } from '@apollo/server/standalone'
-import { GraphQLError } from 'graphql'
-import { typeDefs } from './schema'
-import { resolvers } from './resolver'
+import { chatMiddleware, requestValidator } from './middleware/chat'
+import { startApolloServer } from './service/apollo-graphql'
+import { initOpenAiClient } from './service/open-ai'
 
 config()
+initOpenAiClient()
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
+const PORT = process.env.PORT || 4000
+const expressClient = express()
 
-
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({ req, res }) => {
-    const authToken = req?.headers?.authorization || ''
-    if (!authToken) {
-      throw new GraphQLError('User is not authenticated', {
-        extensions: {
-          code: 'UNAUTHENTICATED',
-          http: { status: 401 },
-        }
-      })
+// CORS
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+const corsOptions = {
+  origin: (origin: string | undefined, callback: Function) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
     }
-    return { authToken }
-  }
-})
+  },
+  methods: ['GET', 'POST'],
+  credentials: true,
+}
+expressClient.use(cors(corsOptions))
 
-console.log(`🚀  Server ready at: ${url}`)
+expressClient.use(express.json())
+expressClient.post('/chat', ...requestValidator, chatMiddleware)
+
+startApolloServer(expressClient)
+
+expressClient.listen(PORT, () => {
+  console.log(`🚀  Server ready at: http://localhost:${PORT}/graphql`)
+  console.log(`💬  Chat endpoint at: http://localhost:${PORT}/chat`)
+})

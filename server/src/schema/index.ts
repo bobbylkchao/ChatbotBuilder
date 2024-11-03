@@ -7,4 +7,3 @@ export const typeDefs = gql`
     signIn: User
   }
 `
-

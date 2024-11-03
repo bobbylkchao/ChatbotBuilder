@@ -4,58 +4,108 @@ import {
   ChatDisplay,
   ChatInputContainer,
   InputField,
-  MessageItem,
   SubmitMessageButton,
 } from './styled'
-import { Button } from '../button/styled'
-
-interface IMessage {
-  who: 'bot' | 'human'
-  message: string
-  context?: object
-  timestamp: Date
-}
+import { config } from '../../config'
+import { IMessage } from './types'
+import MessageItemComponent from './message-item-component'
 
 const initMessage: IMessage = {
-  who: 'bot',
-  message: `Hi, I'm your virtual travel assistant! How can I help you today`,
+  role: 'system',
+  content: `Hi, I'm your virtual travel assistant! How can I help you today`,
   timestamp: new Date(),
 }
 
 const ChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<IMessage[] | []>([initMessage])
+  const [messages, setMessages] = useState<IMessage[]>([initMessage])
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      const newMessage: IMessage = {
-        who: 'human',
-        message: input,
+      const userNewMessage: IMessage = {
+        role: 'user',
+        content: input,
         timestamp: new Date(),
       }
-      setMessages([...messages, newMessage])
+
+      const loadingMessage: IMessage = {
+        role: 'assistant',
+        content: 'loading',
+        timestamp: new Date(),
+      }
+
+      setMessages((prevMessages) => [...prevMessages, userNewMessage, loadingMessage])
+
       setInput('')
+
+      try {
+        const response = await fetch(config.API_CHAT_STREAM_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: [...messages, userNewMessage],
+          }),
+        })
+
+        const stream = response.body
+        if (!stream) return
+        
+        const reader = stream.getReader()
+        const decoder = new TextDecoder()
+        let assistantContent = ''
+
+        const readChunk = async () => {
+          const { value, done } = await reader.read()
+          if (done) {
+            setMessages((prevMessages) => 
+              prevMessages.map((message) => {
+                if (message.content === 'loading') {
+                  return {
+                    ...message,
+                    role: 'assistant',
+                    content: assistantContent.trim(),
+                    timestamp: new Date(),
+                  }
+                }
+                return message
+              })
+            )
+            console.log('Stream finished')
+            return
+          }
+
+          let chunkString = decoder.decode(value)
+          chunkString = chunkString.replace(/ +/g, ' ')
+          chunkString = chunkString.replace(/\s*'\s*/g, "'")
+          chunkString = chunkString.replace(/`/g, '')
+          assistantContent += chunkString
+          readChunk()
+        }
+
+        readChunk()
+      } catch (error) {
+        console.error('Error sending message:', error)
+      }
     }
   }
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    console.log('messages is updated!!', messages)
   }, [messages])
 
   return (
     <ChatContainer>
       <ChatDisplay>
-        {messages.map((message, index) => {
-          return (
-            <MessageItem key={index} who={message.who}>
-              <div className='message'>
-                <p>{ message.message }</p>
-                <p className='timestamp'>{ message.who === 'bot' && 'Bot · '}{message.timestamp.toLocaleTimeString()}</p>
-              </div>
-            </MessageItem>
-          )
-        })}
+        {messages.map((message) => (
+          <MessageItemComponent key={`${message.role}-${message.timestamp.getTime()}`} message={message} />
+        ))}
         <div ref={chatEndRef} />
       </ChatDisplay>
       <ChatInputContainer>

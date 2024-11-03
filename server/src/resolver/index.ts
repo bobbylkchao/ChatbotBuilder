@@ -1,4 +1,4 @@
-import { signIn } from './signIn'
+import { signIn } from './sign-in'
 
 export const resolvers = {
   Query: {
