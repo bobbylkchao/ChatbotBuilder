@@ -12,7 +12,7 @@ import MessageItemComponent from './message-item-component'
 
 const initMessage: IMessage = {
   role: 'system',
-  content: `Hi, I'm your virtual travel assistant! How can I help you today`,
+  content: `Hi, I'm your virtual assistant! How can I help you today?`,
   timestamp: new Date(),
 }
 
@@ -44,6 +44,7 @@ const ChatBot: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': sessionStorage.getItem('authorizationToken') || '',
           },
           body: JSON.stringify({
             messages: [...messages, userNewMessage],
@@ -73,7 +74,6 @@ const ChatBot: React.FC = () => {
                 return message
               })
             )
-            console.log('Stream finished')
             return
           }
 
@@ -96,17 +96,13 @@ const ChatBot: React.FC = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  useEffect(() => {
-    console.log('messages is updated!!', messages)
-  }, [messages])
-
   return (
     <ChatContainer>
       <ChatDisplay>
         {messages.map((message) => (
           <MessageItemComponent key={`${message.role}-${message.timestamp.getTime()}`} message={message} />
         ))}
-        <div ref={chatEndRef} />
+        <div style={{height: 20}} ref={chatEndRef} />
       </ChatDisplay>
       <ChatInputContainer>
         <InputField

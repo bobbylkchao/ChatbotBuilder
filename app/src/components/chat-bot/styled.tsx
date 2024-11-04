@@ -5,7 +5,7 @@ import { themeConfig } from '../../theme/config'
 export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 40vw;
   height: 100vh;
   border: 0;
   overflow: hidden;
@@ -62,9 +62,9 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
     )};
 
     p {
-      margin: ${(props) => (
-        props.role === 'user' || props.role === 'system' ? 0 : '10px 0'
-      )};
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
     }
 
     h1,h2,h3,h4,h5,ol,ul,li {

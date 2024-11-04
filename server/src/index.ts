@@ -1,7 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import { config } from 'dotenv'
+import logger from './misc/logger'
 import { chatMiddleware, requestValidator } from './middleware/chat'
+import authMiddleware from './middleware/auth'
 import { startApolloServer } from './service/apollo-graphql'
 import { initOpenAiClient } from './service/open-ai'
 
@@ -25,13 +27,13 @@ const corsOptions = {
   credentials: true,
 }
 expressClient.use(cors(corsOptions))
-
 expressClient.use(express.json())
-expressClient.post('/chat', ...requestValidator, chatMiddleware)
+expressClient.use('/api', authMiddleware)
+expressClient.post('/api/chat', ...requestValidator, chatMiddleware)
 
 startApolloServer(expressClient)
 
 expressClient.listen(PORT, () => {
-  console.log(`🚀  Server ready at: http://localhost:${PORT}/graphql`)
-  console.log(`💬  Chat endpoint at: http://localhost:${PORT}/chat`)
+  logger.info(`🚀  Server ready at: http://localhost:${PORT}/graphql`)
+  logger.info(`💬  Chat endpoint at: http://localhost:${PORT}/chat`)
 })

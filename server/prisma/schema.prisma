@@ -22,15 +22,38 @@ enum ERole {
   @@map("role_enum")
 }
 
+enum EUserStatus {
+  INVITED
+  ACTIVE
+
+  @@map("user_status_enum")
+}
+
 model User {
   id         String       @id @default(uuid()) @map("user_id")
   email      String       @unique @map("user_email")
   name       String?      @map("user_name")
-  openid     String       @map("open_id")
+  openid     String?      @map("open_id")
   role       ERole        @default(VIEWER) @map("role_name")
+  status     EUserStatus  @default(ACTIVE) @map("user_status")
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @default(now()) @map("updated_at")
 
+  userBots   Bot[]
+
   @@unique(fields: [email, openid], name: "user_email_openid")
   @@map("users")
+}
+
+model Bot {
+  id         String       @id @default(uuid()) @map("bot_id")
+  name       String       @map("bot_name")
+  userId     String       @map("user_id")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @map("updated_at")
+
+  userBot    User         @relation(fields: [userId], references: [id])
+
+  @@unique(fields: [name, userId], name: "user_bot")
+  @@map("bots")
 }
