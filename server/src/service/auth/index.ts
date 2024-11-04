@@ -1,6 +1,8 @@
 import axios from 'axios'
+import { User } from '@prisma/client'
 import { GraphQLError } from 'graphql'
-import { getUser, createUser } from '../user'
+import logger from '../../misc/logger'
+import { getUser, createUser } from '../database/user'
 
 const unAuthenticatedError = new GraphQLError('User is not authenticated', {
   extensions: {
@@ -9,20 +11,24 @@ const unAuthenticatedError = new GraphQLError('User is not authenticated', {
   }
 })
 
-export const auth = async (authToken: string) => {
+type TAuthReturn = Promise<User | null>
+
+export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuthReturn => {
   try {
     if (!authToken) {
-      throw unAuthenticatedError
+      if (source === 'graphql') {
+        throw unAuthenticatedError
+      }
     }
 
     // local development via Apollo Studio
     if (authToken === 'development') {
       return {
-        email: 'test@test.com',
+        email: 'apollo-studio-test@blueprintai.ca',
         name: 'Test',
         id: '3c3dba18-029c-4662-8ea1-612e2f261cfd',
-        openid: '123456789',
-        role: 'VIEWER',
+        openid: '0000',
+        role: 'OPERATOR',
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -42,19 +48,34 @@ export const auth = async (authToken: string) => {
     if (openId && email) {
       let user = await getUser(openId, email)
       if (!user) {
+        // Users can only create accounts by invitation
         user = await createUser({
           openid: openId,
           email,
           name,
         })
       }
+      
+      if (!user) {
+        if (source === 'graphql') {
+          throw unAuthenticatedError
+        }
+        return null
+      }
+
       return user
     } else {
-      console.error('openId or email null')
-      throw unAuthenticatedError
+      logger.error('openId or email is null')
+      if (source === 'graphql') {
+        throw unAuthenticatedError
+      }
     }
 
+    return null
   } catch (error) {
-    throw unAuthenticatedError
+    if (source === 'graphql') {
+      throw unAuthenticatedError
+    }
+    return null
   }
 }

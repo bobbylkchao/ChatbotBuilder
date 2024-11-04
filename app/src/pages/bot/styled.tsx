@@ -1,11 +1,8 @@
 import styled from "styled-components"
 
-export const RightContainer = styled.div`
+export const BotContainer = styled.div`
   display: flex;
-  width: 50%;
-`
-
-export const LeftContainer = styled.div`
-  display: flex;
-  width: 50%;
+  align-items: center;
+  flex-direction: column;
+  background-color: #ffffff;
 `

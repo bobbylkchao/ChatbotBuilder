@@ -4,6 +4,7 @@ import { GraphQLError } from 'graphql'
 import { Express, Request, Response } from 'express'
 import { typeDefs } from '../../schema'
 import { resolvers } from '../../resolver'
+import { isTrafficAllowed } from '../../misc/is-traffic-allowed'
 
 export const startApolloServer = async (express: Express) => {
   const apolloServer = new ApolloServer({
@@ -15,21 +16,17 @@ export const startApolloServer = async (express: Express) => {
 
   express.use('/graphql', expressMiddleware(apolloServer, {
     context: async ({ req }) => {
-      const origin = req.headers.origin || req.headers.referer
-      const isNonProdApolloStudio = process.env.ENVIRONMENT !== 'prod' && origin === `http://localhost:${process.env.PORT || 4000}`
-  
-      let authToken = req?.headers?.authorization || ''
-      if (!authToken && !isNonProdApolloStudio) {
+      const origin = (req.headers.origin || req.headers.referer) || ''
+      let authorizationToken = req?.headers?.authorization || ''
+      const { isAllowed, authToken } = isTrafficAllowed(origin, authorizationToken)
+
+      if (!isAllowed || !authToken) {
         throw new GraphQLError('User is not authenticated', {
           extensions: {
             code: 'UNAUTHENTICATED',
             http: { status: 401 },
           },
         })
-      }
-  
-      if (isNonProdApolloStudio) {
-        authToken = 'development'
       }
   
       return { authToken }

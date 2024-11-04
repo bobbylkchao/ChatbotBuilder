@@ -26,11 +26,6 @@ const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) 
     updateMessageContent()
   }, [message])
 
-  useEffect(() => {
-    console.log('content', content)
-  }, [content])
-  
-
   return (
     <MessageItem role={message.role}>
       <div>
