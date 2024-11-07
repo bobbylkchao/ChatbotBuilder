@@ -1,20 +1,21 @@
 import OpenAI from 'openai'
 import { Request, Response, RequestHandler } from 'express'
-import { body, validationResult } from 'express-validator'
+import { param, body, validationResult } from 'express-validator'
 import logger from '../misc/logger'
 import { openAiClient, getModel } from '../service/open-ai'
 import { chatBotServiceEntry } from '../service/chat-bot'
 import { IMessage } from '../service/chat-bot/type'
 
 export const chatMiddleware = async (req: Request, res: Response) => {
+  const botId = req.params.botId
+  if (!botId) {
+    return res.status(400).json({ error: 'botId is required' });
+  }
+
   const { messages }: { messages: IMessage[] } = req.body
 
   if (!process.env.OPENAI_API_KEY) {
     return res.status(500).json({ message: 'OpenAI API key is missing' })
-  }
-
-  if (!messages || messages.length === 0) {
-    return res.status(500).json({ message: 'Message is empty' })
   }
 
   res.setHeader('Content-Type', 'text/event-stream')
@@ -22,11 +23,10 @@ export const chatMiddleware = async (req: Request, res: Response) => {
   res.setHeader('Connection', 'keep-alive')
 
   try {
-    // TODO: bot uuid
-    await chatBotServiceEntry(messages, res)
+    await chatBotServiceEntry(botId, messages, res)
   } catch (error) {
-    logger.error(error, 'Encountered an error when requesting the model')
-    return res.status(500).json({ message: 'Encountered an error when requesting the model', error })
+    logger.error(error, 'Encountered an error when processing chat')
+    return res.status(500).json({ message: 'Encountered an error when processing chat', error })
   }
 }
 
@@ -39,6 +39,9 @@ export const validatorHandler: RequestHandler = (req, res, next) => {
 }
 
 export const requestValidator = [
+  param('botId')
+    .isUUID()
+    .withMessage('botId must be a valid UUID'),
   body('messages')
     .isArray()
     .withMessage('Messages must be an array'),

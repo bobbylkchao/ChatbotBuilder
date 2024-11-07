@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import {
   ChatContainer,
   ChatDisplay,
@@ -7,8 +7,15 @@ import {
   SubmitMessageButton,
 } from './styled'
 import { config } from '../../config'
-import { IMessage } from './types'
+import { IMessage, IChatStreamReturn } from './types'
 import MessageItemComponent from './message-item-component'
+import LoadingAnimation from '../loading-animation'
+import { convertStringToJson } from '../../misc/covert-string-to-json'
+import { fetchChatApi } from './fetch-chat-api'
+
+interface IArgs {
+  botId: string
+}
 
 const initMessage: IMessage = {
   role: 'system',
@@ -16,8 +23,8 @@ const initMessage: IMessage = {
   timestamp: new Date(),
 }
 
-const ChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<IMessage[]>([initMessage])
+const ChatBot = ({ botId }: IArgs): React.ReactElement => {
+  const [messages, setMessages] = useState<IMessage[] | []>([])
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
@@ -40,17 +47,10 @@ const ChatBot: React.FC = () => {
       setInput('')
 
       try {
-        const response = await fetch(config.API_CHAT_STREAM_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionStorage.getItem('authorizationToken') || '',
-          },
-          body: JSON.stringify({
-            messages: [...messages, userNewMessage],
-          }),
+        const requestPayload = JSON.stringify({
+          messages: [...messages, userNewMessage],
         })
-
+        const response = await fetchChatApi(botId, requestPayload)
         const stream = response.body
         if (!stream) return
         
@@ -64,11 +64,26 @@ const ChatBot: React.FC = () => {
             setMessages((prevMessages) => 
               prevMessages.map((message) => {
                 if (message.content === 'loading') {
-                  return {
-                    ...message,
-                    role: 'assistant',
-                    content: assistantContent.trim(),
-                    timestamp: new Date(),
+                  const convertContentToJson = convertStringToJson(assistantContent)
+
+                  if (convertContentToJson && typeof convertContentToJson === 'object') {
+                    // Structured response
+                    const structuredResponse = convertContentToJson as unknown as IChatStreamReturn
+                    return {
+                      ...message,
+                      role: 'assistant',
+                      content: structuredResponse?.message?.trim(),
+                      timestamp: new Date(),
+                      ...(structuredResponse.componentItem && { componentItem: structuredResponse.componentItem})
+                    }
+                  } else {
+                    // Un-structured response, string format
+                    return {
+                      ...message,
+                      role: 'assistant',
+                      content: assistantContent.trim(),
+                      timestamp: new Date(),
+                    }
                   }
                 }
                 return message
@@ -92,17 +107,73 @@ const ChatBot: React.FC = () => {
     }
   }
 
+  const hasFetchedGreeting = useRef(false)
+  const getGreetingMessage = useCallback(async () => {
+    if (hasFetchedGreeting.current) return
+    hasFetchedGreeting.current = true
+    try {
+      const requestPayload = JSON.stringify({
+        messages: [],
+      })
+      const response = await fetchChatApi(botId, requestPayload)
+      const stream = response.body
+      if (!stream) return
+      
+      const reader = stream.getReader()
+      const decoder = new TextDecoder()
+      let assistantContent = ''
+
+      const readChunk = async () => {
+        const { value, done } = await reader.read()
+        if (done) {
+          setMessages([{
+            role: 'assistant',
+            content: assistantContent,
+            timestamp: new Date(),
+          }])
+          hasFetchedGreeting.current = false
+          return
+        }
+
+        let chunkString = decoder.decode(value)
+        chunkString = chunkString.replace(/ +/g, ' ')
+        chunkString = chunkString.replace(/\s*'\s*/g, "'")
+        chunkString = chunkString.replace(/`/g, '')
+        assistantContent += chunkString
+        readChunk()
+      }
+
+      readChunk()
+    } catch (error) {
+      console.error('Error sending message:', error)
+    }
+  }, [botId])
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    setMessages([])
+  }, [botId])
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      console.log('messages.length = 0')
+      getGreetingMessage()
+    }
   }, [messages])
 
   return (
     <ChatContainer>
       <ChatDisplay>
-        {messages.map((message) => (
-          <MessageItemComponent key={`${message.role}-${message.timestamp.getTime()}`} message={message} />
+        {messages.length === 0 ? <div className="message"><LoadingAnimation /></div> : messages.map((message) => (
+          <MessageItemComponent
+            key={`${message.role}-${message.timestamp.getTime()}`}
+            message={message}
+          />
         ))}
-        <div style={{height: 20}} ref={chatEndRef} />
+        <div id="chatbot-container-bottom" style={{height: 20}} ref={chatEndRef} />
       </ChatDisplay>
       <ChatInputContainer>
         <InputField

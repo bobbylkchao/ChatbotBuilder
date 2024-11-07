@@ -5,6 +5,13 @@ interface IIsTrafficAllowedReturn {
 
 export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficAllowedReturn => {
   const isNonProdApolloStudio = process.env.ENVIRONMENT !== 'prod' && origin === `http://localhost:${process.env.PORT || 4000}`
+  
+  if (authToken && !authToken.startsWith('Bearer ')) {
+    return {
+      isAllowed: false,
+      authToken: null
+    }
+  }
 
   if (!authToken && !isNonProdApolloStudio) {
     return {
@@ -13,7 +20,7 @@ export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficA
     }
   }
 
-  if (isNonProdApolloStudio) {
+  if (!authToken && isNonProdApolloStudio) {
     return {
       isAllowed: true,
       authToken: 'development'
@@ -22,6 +29,6 @@ export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficA
 
   return {
     isAllowed: true,
-    authToken: authToken
+    authToken: authToken,
   }
 }

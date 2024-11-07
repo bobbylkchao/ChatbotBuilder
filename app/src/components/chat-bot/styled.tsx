@@ -5,8 +5,8 @@ import { themeConfig } from '../../theme/config'
 export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 40vw;
-  height: 100vh;
+  width: 100%;
+  height: 95%;
   border: 0;
   overflow: hidden;
   background-color: #ffffff;
@@ -33,6 +33,7 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
   >div {
     display: flex;
     flex-direction: column;
+    max-width: 80%;
   }
 
   p.timestamp {
@@ -101,4 +102,8 @@ export const SubmitMessageButton = styled(Button)`
   &:hover {
     background-color: ${themeConfig.backgroundColor.xLighter};
   }
+`
+
+export const ComponentWrapper = styled.div`
+  margin-top: 10px;
 `

@@ -8,7 +8,18 @@ export const getUser = async (openId: string, email: string): Promise<User> => {
       where: {
         openid: openId,
         email: email,
-      }
+      },
+      include: {
+        userBots: {
+          include: {
+            botIntents: {
+              include: {
+                intentHandler: true,
+              },
+            },
+          },
+        },
+      },
     })
     return user
   } catch (err) {

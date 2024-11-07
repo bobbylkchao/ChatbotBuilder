@@ -14,11 +14,6 @@ interface IProps {
 
 export const GlobalStateProvider = ({ children }: IProps): React.ReactElement => {
   const hook = useGlobalStateHook()
-
-  const TestGlobalStateContext = createContext<IUseGlobalStateContext>({
-    user: null,
-    setUser: () => null,
-  })
   return (
     <GlobalStateContext.Provider value={hook}>
       {children}

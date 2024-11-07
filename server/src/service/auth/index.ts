@@ -21,29 +21,26 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
       }
     }
 
+    let result = {}
+    let openId = ''
+    let email = ''
+    let name = ''
     // local development via Apollo Studio
     if (authToken === 'development') {
-      return {
-        email: 'apollo-studio-test@blueprintai.ca',
-        name: 'Test',
-        id: '3c3dba18-029c-4662-8ea1-612e2f261cfd',
-        openid: '0000',
-        role: 'OPERATOR',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
+      openId = '0000'
+      email = 'apollo-studio-test@blueprintai.ca'
+    } else {
+      const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: authToken,
+        },
+      })
+      result = response?.data
+      openId = result?.sub || ''
+      email = result?.email || ''
+      name = result?.name || ''
     }
-
-    const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: {
-        Authorization: authToken,
-      },
-    })
-
-    const result = response?.data
-    const openId = result?.sub || ''
-    const email = result?.email || ''
-    const name = result?.name || ''
+    
 
     if (openId && email) {
       let user = await getUser(openId, email)

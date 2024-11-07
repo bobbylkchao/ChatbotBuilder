@@ -5,4 +5,9 @@ export const BotContainer = styled.div`
   align-items: center;
   flex-direction: column;
   background-color: #ffffff;
+  height: 100%;
+`
+
+export const BotSelectContainer = styled.div`
+  
 `
