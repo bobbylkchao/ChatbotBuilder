@@ -22,7 +22,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<SignInPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/bot" element={<BotPage />} />
+                <Route path="/playground" element={<BotPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>

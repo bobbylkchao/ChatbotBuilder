@@ -1,3 +1,4 @@
+import http from 'http'
 import express from 'express'
 import cors from 'cors'
 import { config } from 'dotenv'
@@ -29,7 +30,7 @@ const corsOptions = {
 expressClient.use(cors(corsOptions))
 expressClient.use(express.json())
 expressClient.use('/api', authMiddleware)
-expressClient.post('/api/chat', ...requestValidator, chatMiddleware)
+expressClient.post('/api/chat/:botId', ...requestValidator, chatMiddleware)
 
 startApolloServer(expressClient)
 

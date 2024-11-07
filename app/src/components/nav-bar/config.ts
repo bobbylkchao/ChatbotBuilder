@@ -4,6 +4,7 @@ import {
   OpenAIOutlined,
   BulbOutlined,
   LogoutOutlined,
+  RobotOutlined,
 } from '@ant-design/icons'
 
 export const navigationConfig = [
@@ -14,7 +15,7 @@ export const navigationConfig = [
   },
   {
     title: 'Bot',
-    icon: MessageOutlined,
+    icon: RobotOutlined,
     pageName: '/bot',
   },
   {
@@ -26,6 +27,11 @@ export const navigationConfig = [
     title: 'Guidelines',
     icon: BulbOutlined,
     pageName: '/guidelines',
+  },
+  {
+    title: 'Playground',
+    icon: MessageOutlined,
+    pageName: '/playground',
   },
   {
     title: 'Logout',

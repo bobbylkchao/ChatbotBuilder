@@ -52,6 +52,7 @@ const GoogleSignIn = (): React.ReactElement => {
         role: userData.role,
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt,
+        ...(userData.userBots && { userBots: userData.userBots })
       })
     }
   }, [data])

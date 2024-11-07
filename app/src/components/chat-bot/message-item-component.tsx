@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { marked } from 'marked'
-import { IMessage } from './types'
+import { IMessage, IComponentItem } from './types'
 import LoadingAnimation from '../loading-animation'
-import { MessageItem } from './styled'
+import { MessageItem, ComponentWrapper } from './styled'
+import { componentConfigs } from './components/config'
 
 interface MessageItemComponentProps {
   message: IMessage
@@ -10,6 +11,7 @@ interface MessageItemComponentProps {
 
 const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) => {
   const [content, setContent] = useState(message.content)
+  const [components, setComponents] = useState<null | IComponentItem[]>(null)
 
   const updateMessageContent = useCallback(async () => {
     if (message.role === 'assistant' && message.content !== 'loading') {
@@ -17,6 +19,10 @@ const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) 
       const htmlContentTwo = await marked.parse(htmlContent)
       const htmlContentThree = await marked.parse(htmlContentTwo)
       setContent(htmlContentThree)
+
+      if (message?.componentItem && message.componentItem.length > 0) {
+        setComponents(message.componentItem)
+      }
     } else {
       setContent(message.content)
     }
@@ -26,13 +32,30 @@ const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) 
     updateMessageContent()
   }, [message])
 
+  const DisplayComponent = useCallback((): React.ReactElement => {
+    if (components && components.length > 0) {
+      const renderedComponents = components.map((component, index) => {
+        const Component = componentConfigs[component?.displayComponentName || '']
+        if (Component) {
+          return <ComponentWrapper key={index}><Component {...component.componentProps} /></ComponentWrapper>
+        }
+        return <></>
+      })
+      return <>{renderedComponents}</>
+    }
+    return <></>
+  }, [components])
+
   return (
     <MessageItem role={message.role}>
       <div>
         {content === 'loading' ? (
           <div className="message"><LoadingAnimation /></div>
         ) : (
-          <div className="message" dangerouslySetInnerHTML={{ __html: content }} />
+          <>
+            <div className="message" dangerouslySetInnerHTML={{ __html: content }} />
+            <DisplayComponent />
+          </>
         )}
         <p className="timestamp">
           {message.role === 'user' ? '' : 'Bot · '}

@@ -29,6 +29,15 @@ enum EUserStatus {
   @@map("user_status_enum")
 }
 
+enum EHandlerType {
+  NONFUNCTIONAL
+  FUNCTIONAL
+  COMPONENT
+  MODELRESPONSE
+
+  @@map("handler_type_enum")
+}
+
 model User {
   id         String       @id @default(uuid()) @map("user_id")
   email      String       @unique @map("user_email")
@@ -46,14 +55,50 @@ model User {
 }
 
 model Bot {
-  id         String       @id @default(uuid()) @map("bot_id")
-  name       String       @map("bot_name")
-  userId     String       @map("user_id")
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @default(now()) @map("updated_at")
+  id                    String       @id @default(uuid()) @map("bot_id")
+  name                  String       @map("bot_name")
+  strictIntentDetection Boolean      @default(false) @map("strict_intent_detection")
+  greetingMessage       String       @map("greeting_message")
+  guidelines            String?      @db.Text @map("bot_guidelines")
+  userId                String       @map("user_id")
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @default(now()) @map("updated_at")
 
   userBot    User         @relation(fields: [userId], references: [id])
+  botIntents Intent[]
 
   @@unique(fields: [name, userId], name: "user_bot")
   @@map("bots")
+}
+
+model Intent {
+  id              String       @id @default(uuid()) @map("intent_id")
+  name            String       @map("intent_name")
+  guidelines      String?      @db.Text @map("intent_guidelines")
+  botId           String       @map("bot_id")
+  requiredFields  String?      @map("intent_required_fields")
+  isEnabled       Boolean      @default(true) @map("is_enabled")
+
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @default(now()) @map("updated_at")
+
+  botIntent       Bot          @relation(fields: [botId], references: [id])
+  intentHandler   IntentHandler?
+
+  @@unique(fields: [name, botId], name: "bot_intent")
+  @@map("intents")
+}
+
+model IntentHandler {
+  id               String       @id @default(uuid()) @map("intent_handler_id")
+  type             EHandlerType @map("intent_handler_type")
+  content          String?      @db.Text @map("intent_handler_content")
+  guidelines       String?      @db.Text @map("intent_handler_guidelines")
+  intentId         String       @unique @map("intent_id")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @default(now()) @map("updated_at")
+
+  intentHandler    Intent       @relation(fields: [intentId], references: [id])
+
+  @@map("intent_handlers")
 }
