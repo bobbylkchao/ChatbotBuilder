@@ -4,6 +4,10 @@
 
 The goal is to create a low-code, configurable platform for creating generative AI-based chatbots.
 
+## Development logs
+
+https://medium.com/@bobbylkchao/list/blueprint-ai-dev-logs-2d5f1cebac1b
+
 
 ## Slack Community
 
