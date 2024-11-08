@@ -19,17 +19,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js (for app and server)
-      - name: Set up Node.js
+      # Set up Node.js (for app and server) with version 20
+      - name: Set up Node.js v20
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # Install dependencies for app and server
+      # Install dependencies for app
       - name: Install dependencies for app
         working-directory: ./app
         run: npm install
 
+      # Install dependencies for server
       - name: Install dependencies for server
         working-directory: ./server
         run: npm install
@@ -63,5 +64,5 @@ jobs:
           - Updated changelogs for app and server
           - Version bump based on the latest commit: $COMMIT_MESSAGE"
           
-          # Push the changes
-          git push origin master
+          # Push the changes using GITHUB_TOKEN for authentication
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint.git master
