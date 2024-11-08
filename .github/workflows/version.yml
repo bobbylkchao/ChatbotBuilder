@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
-    types:
-      - closed
 
 jobs:
   changelog-and-version:
@@ -38,12 +33,12 @@ jobs:
       # Generate changelog for app
       - name: Generate changelog for app
         working-directory: ./app
-        run: npx standard-version --skip.tag --skip.commit
+        run: npx standard-version
 
       # Generate changelog for server
       - name: Generate changelog for server
         working-directory: ./server
-        run: npx standard-version --skip.tag --skip.commit
+        run: npx standard-version
 
       # Commit the changes (changelog and version updates) with the latest commit message from the push
       - name: Commit changes
