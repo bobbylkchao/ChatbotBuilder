@@ -32,14 +32,23 @@ export interface IIntentConfig {
   intentHandler?: IIntentHandler
 }
 
-export interface IIntentDetectionReturn {
-  code: string
+export interface IIntentDetails {
+  intentName?: string,
+  intentSummary?: string,
+  parameters?: string,
+}
+
+export interface IIntentDetectionFormat {
+  code?: string
   strictIntentDetection?: boolean
   questionToUser?: string,
-  intentName?: string
-  parameters?: object
-  intentSummary: string
-  botData: TBotData
+  intentName?: string,
+  intentSummary?: string,
+  parameters?: Record<string, any>,
+}
+
+export interface IIntentDetectionReturn {
+  intents?: IIntentDetectionFormat[]
 }
 
 export interface IChatStreamReturn {

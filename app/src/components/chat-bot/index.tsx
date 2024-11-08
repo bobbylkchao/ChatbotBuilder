@@ -23,19 +23,21 @@ const initMessage: IMessage = {
   timestamp: new Date(),
 }
 
+const MESSAGE_FILTER_REGEX = /MESSAGE_START\|([\s\S]*?)\|MESSAGE_END/g
+
 const ChatBot = ({ botId }: IArgs): React.ReactElement => {
   const [messages, setMessages] = useState<IMessage[] | []>([])
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (input.trim()) {
       const userNewMessage: IMessage = {
         role: 'user',
         content: input,
         timestamp: new Date(),
       }
-
+  
       const loadingMessage: IMessage = {
         role: 'assistant',
         content: 'loading',
@@ -43,9 +45,8 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
       }
 
       setMessages((prevMessages) => [...prevMessages, userNewMessage, loadingMessage])
-
       setInput('')
-
+  
       try {
         const requestPayload = JSON.stringify({
           messages: [...messages, userNewMessage],
@@ -53,60 +54,56 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
         const response = await fetchChatApi(botId, requestPayload)
         const stream = response.body
         if (!stream) return
-        
+  
         const reader = stream.getReader()
         const decoder = new TextDecoder()
         let assistantContent = ''
-
+  
         const readChunk = async () => {
           const { value, done } = await reader.read()
           if (done) {
-            setMessages((prevMessages) => 
-              prevMessages.map((message) => {
-                if (message.content === 'loading') {
-                  const convertContentToJson = convertStringToJson(assistantContent)
-
-                  if (convertContentToJson && typeof convertContentToJson === 'object') {
-                    // Structured response
-                    const structuredResponse = convertContentToJson as unknown as IChatStreamReturn
-                    return {
-                      ...message,
-                      role: 'assistant',
-                      content: structuredResponse?.message?.trim(),
-                      timestamp: new Date(),
-                      ...(structuredResponse.componentItem && { componentItem: structuredResponse.componentItem})
-                    }
-                  } else {
-                    // Un-structured response, string format
-                    return {
-                      ...message,
-                      role: 'assistant',
-                      content: assistantContent.trim(),
-                      timestamp: new Date(),
-                    }
-                  }
-                }
-                return message
-              })
+            const messagesFilterInArray = Array.from(
+              assistantContent.matchAll(MESSAGE_FILTER_REGEX),
+              match => match[1].trim()
             )
+
+            setMessages(prevMessages => {
+              const updatedMessages = [...prevMessages]
+              messagesFilterInArray.forEach((messageInArray, index) => {
+                const loadingMessage = updatedMessages.find(
+                  message => message.content === 'loading' && message.role === 'assistant'
+                )
+                if (loadingMessage) {
+                  loadingMessage.content = messageInArray
+                  loadingMessage.timestamp = new Date()
+                } else {
+                  updatedMessages.push({
+                    role: 'assistant',
+                    content: messageInArray,
+                    timestamp: new Date(),
+                  })
+                }
+                messagesFilterInArray.splice(index, 1)
+              })
+              return updatedMessages
+            })
+
             return
           }
-
+  
           let chunkString = decoder.decode(value)
-          chunkString = chunkString.replace(/ +/g, ' ')
-          chunkString = chunkString.replace(/\s*'\s*/g, "'")
-          chunkString = chunkString.replace(/`/g, '')
+          chunkString = chunkString.replace(/ +/g, ' ').replace(/\s*'\s*/g, "'").replace(/`/g, '')
           assistantContent += chunkString
           readChunk()
         }
-
+  
         readChunk()
       } catch (error) {
         console.error('Error sending message:', error)
       }
     }
-  }
-
+  }, [input, messages, botId])
+  
   const hasFetchedGreeting = useRef(false)
   const getGreetingMessage = useCallback(async () => {
     if (hasFetchedGreeting.current) return
@@ -126,11 +123,19 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
       const readChunk = async () => {
         const { value, done } = await reader.read()
         if (done) {
-          setMessages([{
-            role: 'assistant',
-            content: assistantContent,
-            timestamp: new Date(),
-          }])
+          const messagesArray = Array.from(
+            assistantContent.matchAll(MESSAGE_FILTER_REGEX),
+            match => match[1].trim() 
+          )
+          const newMessages: IMessage[] = []
+          messagesArray.map(message => {
+            newMessages.push({
+              role: 'assistant',
+              content: message,
+              timestamp: new Date(),
+            })
+          })
+          setMessages(newMessages)
           hasFetchedGreeting.current = false
           return
         }
@@ -159,7 +164,6 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
 
   useEffect(() => {
     if (messages.length === 0) {
-      console.log('messages.length = 0')
       getGreetingMessage()
     }
   }, [messages])
@@ -167,9 +171,9 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
   return (
     <ChatContainer>
       <ChatDisplay>
-        {messages.length === 0 ? <div className="message"><LoadingAnimation /></div> : messages.map((message) => (
+        {messages.length === 0 ? <div className="message"><LoadingAnimation /></div> : messages.map((message, index) => (
           <MessageItemComponent
-            key={`${message.role}-${message.timestamp.getTime()}`}
+            key={`${message.role}-${message.timestamp.getTime()}-${index}`}
             message={message}
           />
         ))}
