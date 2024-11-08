@@ -33,12 +33,18 @@ jobs:
       # Generate changelog for app
       - name: Generate changelog for app
         working-directory: ./app
-        run: npx standard-version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          npx standard-version
 
       # Generate changelog for server
       - name: Generate changelog for server
         working-directory: ./server
-        run: npx standard-version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          npx standard-version
 
       # Commit the changes (changelog and version updates) with the latest commit message from the push
       - name: Commit changes
