@@ -1,0 +1,67 @@
+name: CI - Generate Changelog and Update Version
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  changelog-and-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js (for app and server)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Install dependencies for app and server
+      - name: Install dependencies for app
+        working-directory: ./app
+        run: npm install
+
+      - name: Install dependencies for server
+        working-directory: ./server
+        run: npm install
+
+      # Generate changelog for app
+      - name: Generate changelog for app
+        working-directory: ./app
+        run: npx standard-version --skip.tag --skip.commit
+
+      # Generate changelog for server
+      - name: Generate changelog for server
+        working-directory: ./server
+        run: npx standard-version --skip.tag --skip.commit
+
+      # Commit the changes (changelog and version updates) with the latest commit message from the push
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          
+          # Get the latest commit message
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          
+          # Add files to staging
+          git add app/CHANGELOG.md server/CHANGELOG.md
+          git add app/package.json server/package.json
+          
+          # Commit with the dynamic commit message
+          git commit -m "chore(release): auto-generate changelog and bump version
+
+          - Updated changelogs for app and server
+          - Version bump based on the latest commit: $COMMIT_MESSAGE"
+          
+          # Push the changes
+          git push origin master
