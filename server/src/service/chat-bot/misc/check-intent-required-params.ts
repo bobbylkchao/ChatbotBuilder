@@ -1,4 +1,4 @@
-import { IIntentDetectionReturn, IIntentConfig, IIntentHandler } from "../type"
+import { TBotData, IIntentDetectionFormat, IIntentConfig, IIntentHandler } from "../type"
 import logger from "../../../misc/logger"
 
 interface ICheckIntentRequiredParamsReturn {
@@ -7,9 +7,12 @@ interface ICheckIntentRequiredParamsReturn {
   intentHandler?: IIntentHandler
 }
 
-export const checkIntentRequiredParams = (intentDetectionResult: IIntentDetectionReturn): ICheckIntentRequiredParamsReturn => {
+export const checkIntentRequiredParams = (
+  botData: TBotData,
+  intentDetectionResult: IIntentDetectionFormat
+): ICheckIntentRequiredParamsReturn => {
   // Get intent config
-  const getIntentConfig = intentDetectionResult?.botData?.botIntents?.find(intent => intent.name === intentDetectionResult.intentName) as IIntentConfig
+  const getIntentConfig = botData?.botIntents?.find(intent => intent.name === intentDetectionResult.intentName) as IIntentConfig
   if (!getIntentConfig) {
     logger.error(`intent: ${intentDetectionResult.intentName} not found in intents table`)
     throw new Error(`intent: ${intentDetectionResult.intentName} not found`)
@@ -31,6 +34,7 @@ export const checkIntentRequiredParams = (intentDetectionResult: IIntentDetectio
     return {
       hasMissingRequiredParams: true,
       missingFields: missingFieldsString,
+      intentHandler: getIntentConfig.intentHandler,
     }
   }
 

@@ -5,6 +5,7 @@ import logger from '../misc/logger'
 import { openAiClient, getModel } from '../service/open-ai'
 import { chatBotServiceEntry } from '../service/chat-bot'
 import { IMessage } from '../service/chat-bot/type'
+import { messageResponseFormat } from '../service/chat-bot/misc/message-response-format'
 
 export const chatMiddleware = async (req: Request, res: Response) => {
   const botId = req.params.botId
@@ -26,7 +27,8 @@ export const chatMiddleware = async (req: Request, res: Response) => {
     await chatBotServiceEntry(botId, messages, res)
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
-    return res.status(500).json({ message: 'Encountered an error when processing chat', error })
+    res.write(messageResponseFormat('Encountered an error when processing chat.'))
+    res.end()
   }
 }
 

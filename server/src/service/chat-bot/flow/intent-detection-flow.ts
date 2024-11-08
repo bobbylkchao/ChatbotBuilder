@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { openAiClient, getModel } from '../../open-ai'
 import logger from '../../../misc/logger'
-import { IIntentDetectionReturn, TBotData } from '../type'
+import { IIntentDetectionReturn, TBotData, IIntentDetails, IIntentDetectionFormat } from '../type'
 import { checkIntentClarity } from '../misc/check-intent-clarity'
 import { intentDetectionFlowReturnCode } from '../constants'
 
@@ -23,8 +23,10 @@ export const intentDetectionFlow = async (
     // If 'strictIntentDetection' field in bot table is true
     if (!intentClarity.isIntentClear && isStrictIntentDetectionEnabled) {
       return {
-        code: intentDetectionFlowReturnCode.INTENT_UN_CLEAR,
-        questionToUser: intentClarity.questionToUser || 'Could you please clarify your question?'
+        intents: {
+          code: intentDetectionFlowReturnCode.INTENT_UN_CLEAR,
+          questionToUser: intentClarity.questionToUser || 'Could you please clarify your question?'
+        }
       }
     }
 
@@ -44,20 +46,31 @@ export const intentDetectionFlow = async (
     ===============
     Guidelines:
       - Note: 'Intent list configuration' in 'Context' is my predefined intent configuration, 'intentName' is the name of the intent, 'intentRequiredFieds' is the required fields to be extracted from the user's question. Some intents have an empty value for 'intentRequiredFieds'.
-      - Analyze current user's question to determine which intent from the intent list configuration it matches most closely.
-      - Return the result as a JSON object, not as a string. The format must be:
+      - Analyze current user's question to determine which intent from the intent list configuration it matches most closely. Also analyze whether it contains multiple intents.
+      - Return the result as an Array data type, and this array includes JSON objects. The out format must be:
         {
-          "intentName": "<matched_intent_name>",
-          "intentSummary": "<Summarize the user's intent>",
-          "parameters": { "requiredField1": "<actual_value_from_user>", "requiredField2": "<actual_value_from_user>" }
-        } 
-      - Summarize the user's intent and populate it to 'intentSummary' field in JSON object, data type is string, keep summary short and not too long.
+          result: [
+            {
+              "intentName": "<matched_intent_name 1>",
+              "intentSummary": "<Summarize the user's intent 1>",
+              "parameters": { "requiredField1": "<actual_value_from_user>", "requiredField2": "<actual_value_from_user>" }
+            },
+            {
+              "intentName": "<matched_intent_name 2>",
+              "intentSummary": "<Summarize the user's intent 2>",
+              "parameters": { "requiredField1": "<actual_value_from_user>", "requiredField2": "<actual_value_from_user>" }
+            },
+          ]
+        }
+      - If multiple intents are involved, add multiple JSON objects to array.
+      - Summarize each user's intent and populate it to 'intentSummary' field in JSON object, data type is string, keep summary short and not too long.
       - If an intent match is found, extract the necessary parameter fields from the user's question based on 'intentRequiredFieds' and populate the 'parameters' object. Do not use placeholders like "<value>".
       - If intent dose not have 'intentRequiredFieds' config, set 'parameters' to an empty object.
       - If any required parameters are missing, set 'parameters' to an empty object.
       - If no intent match is found, set 'intentName' to 'NULL' and 'parameters' to an empty object.
       - If user is unsure or cannot provide required parameters (e.g., “I don't have”), do not match the intent. Instead, set 'intentName' to 'NULL' and 'parameters' to an empty object.
-      - Ensure that the output is a proper JSON object without any escaped characters (e.g., no '\n').
+      - Strictly follow my output format requirements and do not add additional properties.
+      - Ensure that the output is array format with proper JSON objects without any escaped characters (e.g., no '\n').
     ===============
     `
 
@@ -79,42 +92,65 @@ export const intentDetectionFlow = async (
     )
   
     const intentResult = request.choices?.[0]?.message?.content || null
-    let formattedIntentResult: IIntentDetectionReturn
+    let formattedIntentResult: IIntentDetails[] = []
 
     if (typeof intentResult === 'string') {
       try {
         const parsedIntentResult = JSON.parse(intentResult.replace(/\\n/g, '').replace(/\\/g, ''))
-        if (parsedIntentResult?.intentName && typeof parsedIntentResult?.intentName === 'string') {
-          formattedIntentResult = {
-            intentName: parsedIntentResult.intentName,
-            parameters: parsedIntentResult?.parameters || {},
-            intentSummary: parsedIntentResult?.intentSummary,
+        
+        if (parsedIntentResult?.result && parsedIntentResult?.result?.length > 0) {
+          for (const intent of parsedIntentResult.result) {
+            if (intent?.intentName && typeof intent?.intentName === 'string') {
+              formattedIntentResult.push({
+                intentName: intent?.intentName,
+                parameters: intent?.parameters || {},
+                intentSummary: intent?.intentSummary,
+              })
+            }
           }
+        } else {
+          throw new Error('Intent result is not an array format')
         }
+  
       } catch (err) {
         logger.error({ err, intentResult }, "Failed to parse intent response")
         throw err
       }
     }
 
-    // Intent is not found/detected from user's question based on bot's intent list
-    if (!formattedIntentResult?.intentName || formattedIntentResult?.intentName === 'NULL') {
-      return {
-        code: intentDetectionFlowReturnCode.INTENT_CONFIG_NOT_FOUND,
-        strictIntentDetection: isStrictIntentDetectionEnabled,
-        // TODO: should add a field in bot table to let developer set prompt?
-        questionToUser: isStrictIntentDetectionEnabled ? "I'm sorry, I'm not sure how to answer that." : '',
-        botData: botData,
-      }
+    // Check each intent
+    let reponse: IIntentDetectionReturn = {
+      intents: [],
     }
 
-    return {
-      code: intentDetectionFlowReturnCode.INTENT_FOUND,
-      intentName: formattedIntentResult.intentName,
-      intentSummary: formattedIntentResult.intentSummary,
-      parameters: formattedIntentResult.parameters,
-      botData: botData,
+    for (const intent of formattedIntentResult) {
+      // Intent is not found/detected from user's question based on bot's intent list
+      let isIntentNotFound = false
+      if (!intent?.intentName || intent?.intentName === 'NULL') {
+        isIntentNotFound = true
+      }
+
+      if (formattedIntentResult.length === 0 || isIntentNotFound) {
+        reponse.intents?.push({
+          code: intentDetectionFlowReturnCode.INTENT_CONFIG_NOT_FOUND,
+          strictIntentDetection: isStrictIntentDetectionEnabled,
+          intentName: intent.intentName || 'NULL',
+          intentSummary: intent.intentSummary || '',
+          parameters: intent.parameters || {},
+          // TODO: should add a field in bot table to let developer set prompt?
+          questionToUser: isStrictIntentDetectionEnabled ? "I'm sorry, I'm not sure how to answer that." : '',
+        })
+      } else {
+        reponse.intents?.push({
+          code: intentDetectionFlowReturnCode.INTENT_FOUND,
+          strictIntentDetection: isStrictIntentDetectionEnabled,
+          intentName: intent.intentName || 'NULL',
+          intentSummary: intent.intentSummary || '',
+          parameters: intent.parameters || {},
+        })
+      }
     }
+    return reponse
   } catch (err) {
     throw err
   }

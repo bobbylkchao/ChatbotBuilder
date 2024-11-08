@@ -1,6 +1,7 @@
 import { Response } from "express"
 import { openAiClient, getModel } from "../../open-ai"
 import { IIntentHandlerFlow } from "./intent-handler-flow"
+import { MESSAGE_START, MESSAGE_END } from "../misc/message-response-format"
 import { IMessage, TBotData } from "../type"
 
 export const modelResponseFlow = async ({
@@ -35,10 +36,10 @@ export const modelResponseFlow = async ({
     },
   )
 
+  res.write(MESSAGE_START)
   for await (const chunk of stream) {
     const content = chunk?.choices[0]?.delta?.content || ""
     res.write(content)
   }
-
-  res.end()
+  res.write(MESSAGE_END)
 }
