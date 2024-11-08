@@ -7,64 +7,70 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 jobs:
+  check_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Ensure branch is master
+        id: check
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/master" ]; then
+            echo "This workflow can only be run on the master branch."
+            echo "should_run=false" >> $GITHUB_ENV
+            exit 1
+          fi
+          echo "should_run=true" >> $GITHUB_ENV
+
   changelog-and-version:
     runs-on: ubuntu-latest
+    needs: check_branch # Ensures check_branch runs first and stops if it fails
+    if: needs.check_branch.result == 'success' # Only run if check_branch succeeded
 
     steps:
-      # Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js (for app and server) with version 20
       - name: Set up Node.js v20
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # Install dependencies for app
       - name: Install dependencies for app
         working-directory: ./app
         run: npm install
 
-      # Install dependencies for server
       - name: Install dependencies for server
         working-directory: ./server
         run: npm install
 
-      # Generate changelog for app
       - name: Generate changelog for app
         working-directory: ./app
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          npx standard-version
+          npx standard-version --skip.tag --skip.commit
 
-      # Generate changelog for server
       - name: Generate changelog for server
         working-directory: ./server
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          npx standard-version
+          npx standard-version --skip.tag --skip.commit
 
-      # Commit the changes (changelog and version updates) with the latest commit message from the push
       - name: Commit changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           
-          # Get the latest commit message
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
           
-          # Add files to staging
           git add app/CHANGELOG.md server/CHANGELOG.md
           git add app/package.json server/package.json
           
-          # Commit with the dynamic commit message
           git commit -m "chore(release): auto-generate changelog and bump version
 
           - Updated changelogs for app and server
           - Version bump based on the latest commit: $COMMIT_MESSAGE"
           
-          # Push the changes using GITHUB_TOKEN for authentication
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint.git master
