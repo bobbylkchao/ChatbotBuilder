@@ -70,7 +70,6 @@ export const chatBotServiceEntry = async (
       }, 'User intent is unclear and returning follow-up question to user')
 
       res.write(messageResponseFormat(intent?.questionToUser || 'Could you please clarify your question?'))
-      //return res.end()
     }
 
     // If intent is not found from bot's intent configs in db
@@ -85,7 +84,6 @@ export const chatBotServiceEntry = async (
         }, "No intent config for user's question and returned to user directly because strict intent detection is enabled")
 
         res.write(messageResponseFormat(intent?.questionToUser || ''))
-        //return res.end()
       } else {
         // Execute general question flow
         logger.info({
