@@ -73,4 +73,4 @@ jobs:
           - Updated changelogs for app and server
           - Version bump based on the latest commit: $COMMIT_MESSAGE"
           
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint.git master
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git master
