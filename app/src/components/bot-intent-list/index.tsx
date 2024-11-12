@@ -26,13 +26,8 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
   // Set intent details data when model is opened
   const openIntentDetailsModal = useCallback(() => {
     setIsModalOpen(true)
-    /*if (intentDetailsFormRef?.current && currentIntentId) {
-      console.log('set data from openIntentDetailsModal', currentIntentId)
-      intentDetailsFormRef?.current?.setData(currentIntentId)// TODO: currentIntentId
-    }*/
   }, [])
 
-  // Set intent details data ref is ready??
   useEffect(() => {
     if (user && intentDetailsFormRef?.current && currentIntentId) {
       const findCurrentIntent = dataSource.find(intent => intent.id === currentIntentId)
