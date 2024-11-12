@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { useGlobalStateContext } from '../../context/global-state'
 import AuthWrapper from '../../components/auth-wrapper'
-import { BotContainer } from './styled'
-import ChatBot from '../../components/chat-bot'
-import BotSelectDropDown from '../../components/bot-select-drop-down'
+import { Container } from './styled'
+import BotList from '../../components/bot-list'
 
 const BotPage = (): React.ReactElement => {
-  const [selectedBot, setSelectedBot] = useState<string>('')
   document.title = 'Bot'
-
   return (
     <AuthWrapper>
-      <BotContainer>
-        <BotSelectDropDown callback={setSelectedBot}/>
-        {selectedBot ? <ChatBot botId={selectedBot}/> : <div></div>}
-      </BotContainer>
+      <Container>
+        <BotList />
+      </Container>
     </AuthWrapper>
   )
 }

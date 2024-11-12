@@ -24,7 +24,7 @@ export const chatMiddleware = async (req: Request, res: Response) => {
   res.setHeader('Connection', 'keep-alive')
 
   try {
-    await chatBotServiceEntry(botId, messages, res)
+    await chatBotServiceEntry(botId, messages, req, res)
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
     res.write(messageResponseFormat('Encountered an error when processing chat.'))

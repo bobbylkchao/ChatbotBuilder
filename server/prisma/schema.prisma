@@ -74,7 +74,6 @@ model Bot {
 model Intent {
   id              String       @id @default(uuid()) @map("intent_id")
   name            String       @map("intent_name")
-  guidelines      String?      @db.Text @map("intent_guidelines")
   botId           String       @map("bot_id")
   requiredFields  String?      @map("intent_required_fields")
   isEnabled       Boolean      @default(true) @map("is_enabled")

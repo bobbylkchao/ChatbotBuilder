@@ -15,7 +15,6 @@ export const ChatContainer = styled.div`
 export const ChatDisplay = styled.div`
   display: flex;
   flex: 1;
-  padding: 16px;
   overflow-y: auto;
   background-color: #ffffff;
   justify-content: left;
@@ -76,7 +75,6 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
 
 export const ChatInputContainer = styled.div`
   display: flex;
-  padding: 0 20px;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;

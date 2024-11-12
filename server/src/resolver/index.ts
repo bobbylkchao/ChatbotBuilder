@@ -1,9 +1,7 @@
-import { signIn } from './sign-in'
-import { getUserBots } from './get-user-bots'
+import { queryResolvers } from './query'
+import { mutationResolvers } from './mutation'
 
 export const resolvers = {
-  Query: {
-    signIn,
-    getUserBots,
-  },
+  ...queryResolvers,
+  ...mutationResolvers,
 }

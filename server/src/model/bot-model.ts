@@ -5,6 +5,7 @@ export const BOT_MODEL = gql`
     id: String!
     name: String!
     greetingMessage: String!
+    strictIntentDetection: Boolean!
     guidelines: String
     createdAt: DateTime!
     updatedAt: DateTime!

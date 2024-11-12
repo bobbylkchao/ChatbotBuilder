@@ -46,3 +46,145 @@ export const getBotGuildlinesAndIntent = async (botId: string) => {
     throw err
   }
 }
+
+interface IUpdateBotArgs {
+  userId: string
+  botId: string
+  botName: string
+  greetingMessage: string
+  guidelines: string
+  strictIntentDetection: boolean
+}
+
+export const updateBot = async ({
+  userId,
+  botId,
+  botName,
+  greetingMessage,
+  guidelines,
+  strictIntentDetection,
+}: IUpdateBotArgs) => {
+  try {
+    const botData = await prisma.bot.findMany({
+      where: {
+        userId: userId,
+      },
+    })
+
+    const findBot = botData.find(bot => bot.id === botId)
+
+    if (!findBot) {
+      throw new Error('Bot not found')
+    }
+
+    const isBotNameExists = botData.find(bot => bot.id !== botId && bot.name === botName)
+
+    if (isBotNameExists) {
+      throw new Error('Bot name already exists')
+    }
+
+    const updateBotQuery = prisma.bot.update({
+      where: {
+        id: botId,
+      },
+      data: {
+        name: botName,
+        strictIntentDetection,
+        greetingMessage,
+        guidelines,
+        updatedAt: new Date(),
+      },
+    })
+
+    return updateBotQuery
+  } catch (err) {
+    logger.error(err, 'DB Error when updating bot data')
+    throw err
+  }
+}
+
+export const createBot = async ({
+  userId,
+  botName,
+  greetingMessage,
+  guidelines,
+  strictIntentDetection,
+}: IUpdateBotArgs) => {
+  try {
+    const botData = await prisma.bot.findUnique({
+      where: {
+        user_bot: {
+          userId: userId,
+          name: botName,
+        },
+      },
+    })
+
+    if (botData) {
+      throw new Error('Bot name already exists')
+    }
+
+    const createBotQuery = prisma.bot.create({
+      data: {
+        userId: userId,
+        name: botName,
+        strictIntentDetection,
+        greetingMessage,
+        guidelines,
+      },
+    })
+
+    return createBotQuery
+  } catch (err) {
+    logger.error(err, 'DB Error when creating bot data')
+    throw err
+  }
+}
+
+interface IDeleteBot {
+  userId: string
+  botId: string
+}
+
+export const deleteBot = async ({
+  userId,
+  botId,
+}: IDeleteBot): Promise<string | boolean> => {
+  try {
+    const findBot = await prisma.bot.findFirst({
+      where: {
+        id: botId,
+        userId: userId,
+      },
+    })
+  
+    if (!findBot) {
+      throw new Error('Bot not found')
+    }
+
+    await prisma.$transaction([
+      prisma.intentHandler.deleteMany({
+        where: {
+          intentHandler: {
+            botId,
+          },
+        },
+      }),
+      prisma.intent.deleteMany({
+        where: {
+          botId: botId,
+        },
+      }),
+      prisma.bot.delete({
+        where: {
+          id: botId,
+        },
+      }),
+    ])
+
+    return botId
+  } catch (err) {
+    logger.error(err, 'Encountered an error when deleting bot')
+    throw err
+  }
+}

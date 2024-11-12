@@ -11,18 +11,27 @@ export interface IUser {
   userBots?: IUserBots[]
 }
 
-export type TBotIntentHandlerType = "NONFUNCTIONAL" | "FUNCTIONAL" | "COMPONENT"
+export type TBotIntentHandlerType = "NONFUNCTIONAL" | "FUNCTIONAL" | "COMPONENT" | "MODELRESPONSE"
 
 export interface IBotIntentHandler {
+  id: string
   type: TBotIntentHandlerType
-  content: string
+  content?: string
+  guidelines?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface IBotIntents {
-  name: string
-  guidelines: string
-  intentHandler: IBotIntentHandler
-  isEnabled: boolean
+  botId: string
+  key?: string
+  id?: string
+  name?: string
+  isEnabled?: boolean
+  intentHandler?: IBotIntentHandler
+  createdAt?: string
+  updatedAt?: string
+  requiredFields?: string
 }
 
 export interface IUserBots {
@@ -30,6 +39,10 @@ export interface IUserBots {
   name: string
   guidelines?: string
   botIntents?: IBotIntents[]
+  createdAt: string
+  updatedAt: string
+  greetingMessage: string
+  strictIntentDetection: boolean
 }[]
 
 export interface IUseGlobalStateContext {

@@ -25,7 +25,6 @@ export interface IIntentConfig {
   id: string
   name: string
   botId: string
-  guidelines: string | null
   requiredFields: string | null
   createdAt: Date
   updatedAt: Date

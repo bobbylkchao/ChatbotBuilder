@@ -16,13 +16,24 @@ export const signInQuery = gql`
         guidelines
         botIntents {
           name
-          guidelines
           isEnabled
           intentHandler {
+            id
             type
             content
+            guidelines
+            createdAt
+            updatedAt
           }
+          createdAt
+          id
+          requiredFields
+          updatedAt
         }
+        createdAt
+        updatedAt
+        greetingMessage
+        strictIntentDetection
       }
     }
   }

@@ -17,7 +17,8 @@ const NavBar = (): React.ReactElement => {
       <NavList>
         {
           navigationConfig.map((item, index) => {
-            const isActived = location.pathname === item.pageName
+            const currentPathName = location.pathname.replace(/(\/[^\/]+).*/, "$1")
+            const isActived = currentPathName === item.pageName
             return (
               <li
                 key={`nav-item-${index}`}
