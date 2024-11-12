@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import logger from '../../misc/logger'
 import { IMessage } from './type'
 import { getBotGuildlinesAndIntent } from '../database/bot'
@@ -13,6 +13,7 @@ import { intentDetectionFlowReturnCode } from './constants'
 export const chatBotServiceEntry = async (
   botId: string,
   messages: IMessage[],
+  req: Request,
   res: Response
 ): Promise<void> => {
   // Get bot's intent config
@@ -134,6 +135,7 @@ export const chatBotServiceEntry = async (
         }, 'Intent handler flow started')
 
         await intentHandlerFlow({
+          req,
           res,
           userInput: recentMessage.content,
           chatHistory: chatHistory,

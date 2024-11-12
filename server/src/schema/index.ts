@@ -9,4 +9,39 @@ export const typeDefs = gql`
     signIn: User
     getUserBots: [Bot]
   }
+  type Mutation {
+    createIntent(
+      botId: String!,
+      name: String!,
+      requiredFields: String,
+      isEnabled: Boolean,
+      intentHandler: IntentHandlerInput
+    ): Intent!
+    updateIntent(
+      id: String!,
+      name: String!,
+      requiredFields: String,
+      isEnabled: Boolean,
+      intentHandler: IntentHandlerInput
+    ): Intent!
+    deleteIntent(
+      intentId: String!
+    ): Boolean!
+    updateBot(
+      botId: String!,
+      botName: String!,
+      greetingMessage: String!,
+      guidelines: String,
+      strictIntentDetection: Boolean,
+    ): Bot!
+    createBot(
+      botName: String!,
+      greetingMessage: String!,
+      guidelines: String,
+      strictIntentDetection: Boolean,
+    ): Bot
+    deleteBot(
+      botId: String!
+    ): String
+  }
 `

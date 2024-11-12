@@ -19,16 +19,6 @@ export const navigationConfig = [
     pageName: '/bot',
   },
   {
-    title: 'Intent',
-    icon: OpenAIOutlined,
-    pageName: '/intent',
-  },
-  {
-    title: 'Guidelines',
-    icon: BulbOutlined,
-    pageName: '/guidelines',
-  },
-  {
     title: 'Playground',
     icon: MessageOutlined,
     pageName: '/playground',

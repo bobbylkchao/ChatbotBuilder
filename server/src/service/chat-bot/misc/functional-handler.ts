@@ -10,7 +10,11 @@ export const functionalHandler = (handlerFunctionBase64: string, context: any = 
       sandbox: context,
       timeout: 60000,// TODO: how many ms is appropriate?
     })
-    return vm.run(`module.exports = ${decodedFunction}`)
+    return vm.run(`
+      module.exports = async function runIntentHandler() {
+        ${decodedFunction}
+      }
+    `)
   } catch (err) {
     logger.error('Encountered an error in functionalHandler')
     throw err

@@ -9,7 +9,7 @@ export const StyledAuthWrapper = styled(Wrapper)`
 export const StyledLeftContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 220px;
   height: 100vh;
   background-color: ${themeConfig.backgroundColor.lighter};
 `
@@ -17,6 +17,9 @@ export const StyledLeftContainer = styled.div`
 export const StyledRightContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100%;
+  width: calc(100vw - 220px);
+  height: 100vh;
+  padding: 0 15px;
+  background-color: #ffffff;
+  color: ${themeConfig.textColor.lighter}
 `

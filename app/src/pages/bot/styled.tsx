@@ -1,13 +1,9 @@
 import styled from "styled-components"
+import { themeConfig } from "../../theme/config"
 
-export const BotContainer = styled.div`
+export const Container = styled.div`
   display: flex;
-  align-items: center;
-  flex-direction: column;
+  flex: 1;
   background-color: #ffffff;
-  height: 100%;
-`
-
-export const BotSelectContainer = styled.div`
-  
+  color: ${themeConfig.textColor.lighter};
 `

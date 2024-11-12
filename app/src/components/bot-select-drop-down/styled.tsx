@@ -12,7 +12,6 @@ export const BotSelectDropDownWrapper = styled.div`
   justify-content: left;
   align-items: center;
   color: ${themeConfig.textColor.lighter};
-  margin-left: 16px;
   border-bottom: 1px solid ${themeConfig.border.primary};
 `
 

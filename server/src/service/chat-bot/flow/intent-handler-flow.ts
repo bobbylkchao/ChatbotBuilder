@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { IIntentHandler } from '../type'
 import logger from '../../../misc/logger'
 import { messageResponseFormat } from '../misc/message-response-format'
@@ -6,6 +6,7 @@ import { functionalHandler } from '../misc/functional-handler'
 import { modelResponseFlow } from './model-response-flow'
 
 export interface IIntentHandlerFlow {
+  req: Request
   res: Response
   userInput: string
   chatHistory: string
@@ -15,6 +16,7 @@ export interface IIntentHandlerFlow {
 }
 
 export const intentHandlerFlow = async ({
+  req,
   res,
   userInput,
   chatHistory,
@@ -36,10 +38,13 @@ export const intentHandlerFlow = async ({
   
   if (intentHandlerType === 'FUNCTIONAL') {
     logger.info({ intentHandlerId }, 'FUNCTIONAL response')
+    // TODO: give a list about all context functions that can be used within sandbox
     // Pass context to inside of sandbox, the code is running in sandbox can use these context
     const contextInSandbox = {
       ...(intentParameters || {}),
+      request: req,
       response: res,
+      fetch: fetch,
     }
     const decodedFunction = functionalHandler(intentHandlerContent, contextInSandbox)
 

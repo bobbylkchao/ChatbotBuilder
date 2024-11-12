@@ -10,7 +10,7 @@ import { config } from '../../config'
 import { IMessage, IChatStreamReturn } from './types'
 import MessageItemComponent from './message-item-component'
 import LoadingAnimation from '../loading-animation'
-import { convertStringToJson } from '../../misc/covert-string-to-json'
+import { convertStringToJson } from '../../misc/convert-string-to-json'
 import { fetchChatApi } from './fetch-chat-api'
 
 interface IArgs {
