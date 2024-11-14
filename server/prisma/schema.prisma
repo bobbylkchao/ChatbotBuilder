@@ -43,7 +43,7 @@ model User {
   email      String       @unique @map("user_email")
   name       String?      @map("user_name")
   openid     String?      @map("open_id")
-  role       ERole        @default(VIEWER) @map("role_name")
+  role       ERole        @default(OPERATOR) @map("role_name")
   status     EUserStatus  @default(ACTIVE) @map("user_status")
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @default(now()) @map("updated_at")
@@ -60,12 +60,14 @@ model Bot {
   strictIntentDetection Boolean      @default(false) @map("strict_intent_detection")
   greetingMessage       String       @map("greeting_message")
   guidelines            String?      @db.Text @map("bot_guidelines")
+  allowedOrigin         String[]     @default([]) @map("bot_allowed_origin")
   userId                String       @map("user_id")
   createdAt             DateTime     @default(now()) @map("created_at")
   updatedAt             DateTime     @default(now()) @map("updated_at")
 
-  userBot    User         @relation(fields: [userId], references: [id])
-  botIntents Intent[]
+  userBot           User         @relation(fields: [userId], references: [id])
+  botIntents        Intent[]
+  botQuickActions   QuickAction?
 
   @@unique(fields: [name, userId], name: "user_bot")
   @@map("bots")
@@ -100,4 +102,16 @@ model IntentHandler {
   intentHandler    Intent       @relation(fields: [intentId], references: [id])
 
   @@map("intent_handlers")
+}
+
+model QuickAction {
+  id               String       @id @default(uuid()) @map("quick_action_id")
+  config           String       @db.Text @map("config")
+  botId            String       @unique @map("bot_id")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @default(now()) @map("updated_at")
+
+  botQuickActions  Bot          @relation(fields: [botId], references: [id])
+
+  @@map("quick_actions")
 }

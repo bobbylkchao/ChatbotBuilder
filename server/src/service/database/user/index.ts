@@ -2,7 +2,7 @@ import { Prisma, User } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
-export const getUser = async (openId: string, email: string): Promise<User> => {
+export const getUser = async (openId: string, email: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -17,6 +17,7 @@ export const getUser = async (openId: string, email: string): Promise<User> => {
                 intentHandler: true,
               },
             },
+            botQuickActions: true,
           },
         },
       },
@@ -28,7 +29,37 @@ export const getUser = async (openId: string, email: string): Promise<User> => {
   }
 }
 
-export const createUser = async (args: Prisma.UserUncheckedCreateInput): Promise<User | null> => {
+export const createUser = async (args: Prisma.UserUncheckedCreateInput): Promise<User> => {
+  try {
+    const createUserQuery = await prisma.user.create({
+      data: {
+        email: args.email,
+        openid: args.openid,
+        status: 'ACTIVE',
+        updatedAt: new Date(),
+        ...(args.role && { role: args.role }),
+        ...(args.name && { name: args.name }),
+      },
+      include: {
+        userBots: {
+          include: {
+            botIntents: {
+              include: {
+                intentHandler: true,
+              },
+            },
+            botQuickActions: true,
+          },
+        },
+      },
+    })
+    return createUserQuery
+  } catch (err) {
+    throw err
+  }
+}
+
+export const activeUser = async (args: Prisma.UserUncheckedCreateInput): Promise<User | null> => {
   try {
     const isUserInvited = await prisma.user.findUnique({
       where: {

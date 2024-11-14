@@ -33,15 +33,21 @@ export const typeDefs = gql`
       greetingMessage: String!,
       guidelines: String,
       strictIntentDetection: Boolean,
+      allowedOrigin: [String],
     ): Bot!
     createBot(
       botName: String!,
       greetingMessage: String!,
       guidelines: String,
       strictIntentDetection: Boolean,
+      allowedOrigin: [String],
     ): Bot
     deleteBot(
       botId: String!
     ): String
+    createQuickAction(
+      botId: String!
+      config: String!
+    ): QuickAction
   }
 `

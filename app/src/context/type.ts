@@ -34,15 +34,24 @@ export interface IBotIntents {
   requiredFields?: string
 }
 
+export interface IBotQuickAction {
+  id: string
+  config: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface IUserBots {
   id: string
   name: string
   guidelines?: string
   botIntents?: IBotIntents[]
+  allowedOrigin?: string[]
   createdAt: string
   updatedAt: string
   greetingMessage: string
   strictIntentDetection: boolean
+  botQuickActions?: IBotQuickAction
 }[]
 
 export interface IUseGlobalStateContext {

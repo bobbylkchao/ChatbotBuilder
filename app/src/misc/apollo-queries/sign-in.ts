@@ -34,6 +34,13 @@ export const signInQuery = gql`
         updatedAt
         greetingMessage
         strictIntentDetection
+        botQuickActions {
+          id
+          config
+          createdAt
+          updatedAt
+        }
+        allowedOrigin
       }
     }
   }

@@ -5,7 +5,7 @@ export const ModalContent = styled.div`
   pre {
     white-space: pre-wrap;
     word-wrap: break-word;
-    background-color: ${themeConfig.backgroundColor.xxLighter};
+    background-color: ${themeConfig.backgroundColor.xxxLighter};
     color: ${themeConfig.textColor.lighter};
     padding: 10px;
     border-radius: 5px;

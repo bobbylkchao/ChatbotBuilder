@@ -23,6 +23,7 @@ export const modelResponseFlow = async ({
           Chat history: \n${chatHistory}.
         ===============
         Global Guidelines:
+          Important: If your answer is going to be in markdown format, please do not return Header 1, which is '#'.
           ${botGuidelines}
         ===============
         Guidelines:

@@ -20,7 +20,7 @@ export const Wrapper = styled.div`
 
   button {
     &:hover{
-      background-color: ${themeConfig.secondary} !important;
+      //background-color: ${themeConfig.secondary} !important;
     }
   }
 `

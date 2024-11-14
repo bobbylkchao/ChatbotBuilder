@@ -3,8 +3,10 @@ interface IIsTrafficAllowedReturn {
   authToken: null | string
 }
 
+// TODO: check graphql 
 export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficAllowedReturn => {
-  const isNonProdApolloStudio = process.env.ENVIRONMENT !== 'prod' && origin === `http://localhost:${process.env.PORT || 4000}`
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+  const isNonProdApolloStudio = process.env.ENVIRONMENT === 'local' && origin === `http://localhost:${process.env.PORT || 4000}`
   
   if (authToken && !authToken.startsWith('Bearer ')) {
     return {
@@ -27,8 +29,15 @@ export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficA
     }
   }
 
+  if (allowedOrigins.includes(origin)) {
+    return {
+      isAllowed: true,
+      authToken: authToken,
+    }
+  }
+
   return {
-    isAllowed: true,
-    authToken: authToken,
+    isAllowed: false,
+    authToken: '',
   }
 }

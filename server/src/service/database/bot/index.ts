@@ -38,6 +38,7 @@ export const getBotGuildlinesAndIntent = async (botId: string) => {
             intentHandler: true,
           }
         },
+        botQuickActions: true,
       },
     })
     return botData
@@ -54,6 +55,7 @@ interface IUpdateBotArgs {
   greetingMessage: string
   guidelines: string
   strictIntentDetection: boolean
+  allowedOrigin?: string[]
 }
 
 export const updateBot = async ({
@@ -63,6 +65,7 @@ export const updateBot = async ({
   greetingMessage,
   guidelines,
   strictIntentDetection,
+  allowedOrigin = [],
 }: IUpdateBotArgs) => {
   try {
     const botData = await prisma.bot.findMany({
@@ -92,6 +95,7 @@ export const updateBot = async ({
         strictIntentDetection,
         greetingMessage,
         guidelines,
+        allowedOrigin,
         updatedAt: new Date(),
       },
     })
@@ -103,13 +107,23 @@ export const updateBot = async ({
   }
 }
 
+interface ICreateBotArgs {
+  userId: string
+  botName: string
+  greetingMessage: string
+  guidelines: string
+  strictIntentDetection: boolean
+  allowedOrigin?: string[]
+}
+
 export const createBot = async ({
   userId,
   botName,
   greetingMessage,
   guidelines,
   strictIntentDetection,
-}: IUpdateBotArgs) => {
+  allowedOrigin = [],
+}: ICreateBotArgs) => {
   try {
     const botData = await prisma.bot.findUnique({
       where: {
@@ -131,6 +145,7 @@ export const createBot = async ({
         strictIntentDetection,
         greetingMessage,
         guidelines,
+        allowedOrigin,
       },
     })
 

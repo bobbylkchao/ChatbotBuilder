@@ -7,8 +7,10 @@ export const BOT_MODEL = gql`
     greetingMessage: String!
     strictIntentDetection: Boolean!
     guidelines: String
+    allowedOrigin: [String]
     createdAt: DateTime!
     updatedAt: DateTime!
     botIntents: [Intent]
+    botQuickActions: QuickAction
   }
 `

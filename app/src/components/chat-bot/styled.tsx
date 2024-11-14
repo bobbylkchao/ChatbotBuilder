@@ -6,7 +6,7 @@ export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 95%;
+  height: 100%;
   border: 0;
   overflow: hidden;
   background-color: #ffffff;
@@ -19,7 +19,6 @@ export const ChatDisplay = styled.div`
   background-color: #ffffff;
   justify-content: left;
   flex-direction: column;
-  overflow-y: scroll;
 `
 
 export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>`
@@ -28,6 +27,7 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
   justify-content: ${(props) => (props.role === 'user' ? 'right' : 'left')};
   text-align: left;
   color: ${themeConfig.primary};
+  font-size: ${themeConfig.textSize.default};
 
   >div {
     display: flex;
@@ -38,7 +38,7 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
   p.timestamp {
     display: flex;
     color: ${themeConfig.textColor.contrast};
-    margin: 5px 0 0 0;
+    margin: 10px 0;
     text-align: ${(props) => (
       props.role === 'user' ? 'right' : 'left'
     )};
@@ -52,7 +52,7 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
       props.role === 'user' ? `${themeConfig.textColor.primary}` : `${themeConfig.textColor.lighter}`
     )};
     border-radius: 10px;
-    padding: 20px 10px;
+    padding: 20px 15px;
     margin: 0;
     background-color: ${(props) => (
       props.role === 'user' ? `${themeConfig.primary}` : `${themeConfig.backgroundColor.xxLighter}`
@@ -60,6 +60,7 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
     border: 1px solid ${(props) => (
       props.role === 'user' ? `${themeConfig.primary}` : `${themeConfig.border.primary}`
     )};
+    box-shadow: rgba(0, 0, 0, 0.03) 5px 4px 4px 0px, rgba(0, 0, 0, 0.24) 0px 0px 1px 0px, rgba(0, 0, 0, 0.16) 0px 2px 1px -1px, rgba(0, 0, 0, 0.12) 0px 2px 4px 0px;
 
     p {
       line-height: 1.5;
@@ -67,9 +68,58 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
       margin: 0;
     }
 
-    h1,h2,h3,h4,h5,ol,ul,li {
+    p:first-child {
+    }
+
+    p:not(:first-of-type) {
       margin: 10px 0;
     }
+
+    h1,h2,h3,h4,h5,ol,ul,li {
+      margin: 0;
+      font-size: ${themeConfig.textSize.default};
+    }
+
+    li {
+      margin: 10px 0;
+    }
+
+    img {
+      width: auto;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    p code {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: ${themeConfig.backgroundColor.xxxLighter};
+      color: ${themeConfig.textColor.lighter};
+      padding: 10px;
+      border-radius: 5px;
+      overflow-y: auto;
+      font-family: Menlo, Consolas, Monaco, "Courier New", monospace;
+      font-size: 14px;
+    }
+
+    pre {
+      margin-top: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: ${themeConfig.backgroundColor.xxxLighter};
+      color: ${themeConfig.textColor.lighter};
+      padding: 10px;
+      border-radius: 5px;
+      overflow-y: auto;
+      font-family: Menlo, Consolas, Monaco, "Courier New", monospace;
+      font-size: 14px;
+      
+      code {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
+
   }
 `
 
@@ -77,7 +127,6 @@ export const ChatInputContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
 `
 
 export const InputField = styled.input`
@@ -95,13 +144,32 @@ export const SubmitMessageButton = styled(Button)`
   font-weight: bold;
   border-radius: 10px;
   height: 100%;
-  background-color: ${themeConfig.backgroundColor.lighter};
-
-  &:hover {
-    background-color: ${themeConfig.backgroundColor.xLighter};
-  }
+  width: 50px;
+  font-size: ${themeConfig.textSize.large};
 `
 
 export const ComponentWrapper = styled.div`
   margin-top: 10px;
+`
+
+export const QuickActionItem = styled.button`
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-width: 0px;
+  border-style: solid;
+  border-radius: 50px;
+  font-size: ${themeConfig.textSize.default};
+  padding: 10px 20px;
+  background-color: rgb(255, 255, 255);
+  color: ${themeConfig.primary};
+  box-shadow: rgba(0, 0, 0, 0.03) 0px -1px 0px 0px, rgba(0, 0, 0, 0.24) 0px 0px 1px 0px, rgba(0, 0, 0, 0.16) 0px 2px 1px -1px, rgba(0, 0, 0, 0.12) 0px 2px 4px 0px;
+  margin-right: 10px;
+
+  &:hover {
+    background-color: rgb(237, 240, 243);
+  }
 `

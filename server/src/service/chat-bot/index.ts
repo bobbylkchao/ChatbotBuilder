@@ -7,8 +7,9 @@ import { generalQuestionFlow } from './flow/general-question-flow'
 import { intentHandlerFlow } from './flow/intent-handler-flow'
 import { askProvideParamsFlow } from './flow/ask-provide-params-flow'
 import { checkIntentRequiredParams } from './misc/check-intent-required-params'
-import { messageResponseFormat } from './misc/message-response-format'
+import { messageResponseFormat, messageResponseFormatJson } from './misc/message-response-format'
 import { intentDetectionFlowReturnCode } from './constants'
+import { IIntentDetectionReturn } from './type'
 
 export const chatBotServiceEntry = async (
   botId: string,
@@ -23,9 +24,22 @@ export const chatBotServiceEntry = async (
     throw new Error(`Bot ${botId} not found`)
   }
 
+  // Get bot's allowed origins setting
+  const requestOrigin = (req?.headers?.origin || req?.headers?.referer) || ''
+  const isTrafficAllowed = botData.allowedOrigin.includes(requestOrigin)
+  if (!isTrafficAllowed) {
+    return res.status(403).json({ error: 'Traffic is not allowed' })
+  }
+
   // First message and send a greeting message
   if (messages.length === 0) {
     res.write(messageResponseFormat(botData.greetingMessage))
+    
+    // Return quick action
+    if (botData.botQuickActions?.config) {
+      res.write(messageResponseFormatJson(botData.botQuickActions.config))
+    }
+
     return res.end()
   }
 
@@ -46,14 +60,26 @@ export const chatBotServiceEntry = async (
 
   const chatHistory = messages.map(m => `${m.role}: ${m.content}`).join('\n')
 
-  // Intent Detection Flow, support multi-intent detection
-  const intentResult = await intentDetectionFlow(
-    res,
-    botData,
-    chatHistory,
-    recentMessage.content,
-  )
-
+  // If bot does not have intent config, bypass
+  let intentResult: IIntentDetectionReturn
+  if (botData.botIntents.length > 0) {
+    // Intent Detection Flow, support multi-intent detection
+    intentResult = await intentDetectionFlow(
+      res,
+      botData,
+      chatHistory,
+      recentMessage.content,
+    )
+  } else {
+    intentResult = {
+      intents: [{
+        code: intentDetectionFlowReturnCode.NO_INTENT_IS_CONFIGURED,
+        strictIntentDetection: botData.strictIntentDetection,
+        questionToUser: '',
+      }]
+    }
+  }
+  
   logger.info({
     recentMessage,
     intents: intentResult,
@@ -74,20 +100,25 @@ export const chatBotServiceEntry = async (
     }
 
     // If intent is not found from bot's intent configs in db
-    if (intent?.code === intentDetectionFlowReturnCode.INTENT_CONFIG_NOT_FOUND) {
+    if (
+      intent?.code === intentDetectionFlowReturnCode.INTENT_CONFIG_NOT_FOUND ||
+      intent?.code === intentDetectionFlowReturnCode.NO_INTENT_IS_CONFIGURED
+    ) {
       if (intent?.strictIntentDetection) {
         // If 'strictIntentDetection' field in bot table is true
         // Then not execute general question flow
         logger.info({
+          code: intent?.code,
           botId,
           userInput: recentMessage.content,
           intent,
         }, "No intent config for user's question and returned to user directly because strict intent detection is enabled")
 
-        res.write(messageResponseFormat(intent?.questionToUser || ''))
+        res.write(messageResponseFormat('Sorry I can\'t answer this question'))
       } else {
         // Execute general question flow
         logger.info({
+          code: intent?.code,
           botId,
           userInput: recentMessage,
           intent,
