@@ -26,7 +26,7 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
     let email = ''
     let name = ''
     // local development via Apollo Studio
-    if (authToken === 'development') {
+    if (authToken === 'development' && process.env.ENVIRONMENT === 'local') {
       openId = '0000'
       email = 'apollo-studio-test@blueprintai.ca'
     } else {
@@ -41,11 +41,9 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
       name = result?.name || ''
     }
     
-
     if (openId && email) {
       let user = await getUser(openId, email)
       if (!user) {
-        // Users can only create accounts by invitation
         user = await createUser({
           openid: openId,
           email,

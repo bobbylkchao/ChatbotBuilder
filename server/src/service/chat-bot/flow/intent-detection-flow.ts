@@ -31,15 +31,19 @@ export const intentDetectionFlow = async (
     }
 
     const intentListFormatted = botIntents.length > 0 ? botIntents.map(
-      intent => `'intent name: ${intent.name}, intent required fields: ${intent.requiredFields || ''}'`
-    ).join('\n') : ''
+      intent => `'intent name: ${intent.name}, intent required fields: ${intent.requiredFields || '\'\''}'`
+    ).join('\n') : 'INTENT NOT CONFIGURED'
 
     const guidelines = `
     ===============
     Context:
       Current user's question: "${userInput}".
-      Intent list configuration: ${intentListFormatted}.
       Chat history: \n${chatHistory}.
+      ===============
+      Intent list configuration start:
+      ${intentListFormatted}
+      Intent list configuration End
+      ===============
     ===============
     Global Guidelines:
       ${botGlobalGuidelines}
@@ -67,7 +71,8 @@ export const intentDetectionFlow = async (
       - If an intent match is found, extract the necessary parameter fields from the user's question based on 'intentRequiredFieds' and populate the 'parameters' object. Do not use placeholders like "<value>".
       - If intent dose not have 'intentRequiredFieds' config, set 'parameters' to an empty object.
       - If any required parameters are missing, set 'parameters' to an empty object.
-      - If no intent match is found, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+      - If the intent is not configured,  set 'intentName' to 'NULL' and 'parameters' to an empty object.
+      - If intent is NOT found, set 'intentName' to 'NULL' and 'parameters' to an empty object.
       - If user is unsure or cannot provide required parameters (e.g., “I don't have”), do not match the intent. Instead, set 'intentName' to 'NULL' and 'parameters' to an empty object.
       - Strictly follow my output format requirements and do not add additional properties.
       - Ensure that the output is array format with proper JSON objects without any escaped characters (e.g., no '\n').
@@ -126,6 +131,8 @@ export const intentDetectionFlow = async (
     for (const intent of formattedIntentResult) {
       // Intent is not found/detected from user's question based on bot's intent list
       let isIntentNotFound = false
+
+      // If bot does not have intent config, bypass
       if (!intent?.intentName || intent?.intentName === 'NULL') {
         isIntentNotFound = true
       }

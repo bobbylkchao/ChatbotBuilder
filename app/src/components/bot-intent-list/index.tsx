@@ -139,7 +139,7 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
           }}
           size='small'
         >
-          <PlusOutlined /> Create Intent
+          <PlusOutlined /> Create New Intent
         </Button>
       </ButtonContainer>
       <Table

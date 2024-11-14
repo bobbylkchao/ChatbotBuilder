@@ -11,6 +11,7 @@ import DashboardPage from './pages/dashboard'
 import PlaygroundPage from './pages/playground'
 import BotPage from './pages/bot'
 import BotDetailsPage from './pages/bot-details'
+import ChatPage from './pages/chat'
 import NotFoundPage from './pages/not-found'
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/playground" element={<PlaygroundPage />} />
                 <Route path="/bot" element={<BotPage />} />
                 <Route path="/bot/:botId" element={<BotDetailsPage />} />
+                <Route path="/chat/:botId" element={<ChatPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>

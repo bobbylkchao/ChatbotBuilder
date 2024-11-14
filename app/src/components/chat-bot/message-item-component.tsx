@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { marked } from 'marked'
+import markdownit from 'markdown-it'
 import { IMessage, IComponentItem } from './types'
 import LoadingAnimation from '../loading-animation'
 import { MessageItem, ComponentWrapper } from './styled'
 import { componentConfigs } from './components/config'
+import { addTargetAttrToHyperLink } from '../../misc/open-link-in-new-window'
 
 interface MessageItemComponentProps {
   message: IMessage
@@ -12,19 +13,25 @@ interface MessageItemComponentProps {
 const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) => {
   const [content, setContent] = useState(message.content)
   const [components, setComponents] = useState<null | IComponentItem[]>(null)
+  const md = markdownit({
+    html: true,
+    linkify: true,
+    typographer: false,
+    breaks: true,
+    quotes: '“”‘’',
+  })
+  md.linkify.set({ fuzzyEmail: false })
 
   const updateMessageContent = useCallback(async () => {
     if (message.role === 'assistant' && message.content !== 'loading') {
-      const htmlContent = await marked.parse(message.content)
-      const htmlContentTwo = await marked.parse(htmlContent)
-      const htmlContentThree = await marked.parse(htmlContentTwo)
-      setContent(htmlContentThree)
+      const htmlContent = md.render(md.render(message.content))
+      setContent(addTargetAttrToHyperLink(htmlContent ))
 
       if (message?.componentItem && message.componentItem.length > 0) {
         setComponents(message.componentItem)
       }
     } else {
-      setContent(message.content)
+      setContent(addTargetAttrToHyperLink(message.content))
     }
   }, [])
 

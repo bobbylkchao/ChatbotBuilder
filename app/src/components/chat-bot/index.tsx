@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
+import { SendOutlined } from '@ant-design/icons'
 import {
   ChatContainer,
   ChatDisplay,
@@ -12,6 +13,9 @@ import MessageItemComponent from './message-item-component'
 import LoadingAnimation from '../loading-animation'
 import { convertStringToJson } from '../../misc/convert-string-to-json'
 import { fetchChatApi } from './fetch-chat-api'
+import QuickActions from './quick-actions'
+import { toast } from 'react-hot-toast'
+import MessageComponent from './message-component'
 
 interface IArgs {
   botId: string
@@ -24,17 +28,39 @@ const initMessage: IMessage = {
 }
 
 const MESSAGE_FILTER_REGEX = /MESSAGE_START\|([\s\S]*?)\|MESSAGE_END/g
+const MESSAGE_JSON_FILTER_REGEX = /JSON_START\|([\s\S]*?)\|JSON_END/g
 
 const ChatBot = ({ botId }: IArgs): React.ReactElement => {
   const [messages, setMessages] = useState<IMessage[] | []>([])
+  const [quickActions, setQuickActions] = useState<string>('')
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSend = useCallback(async () => {
-    if (input.trim()) {
+  const handleErrorMessage = () => {
+    setMessages(preMessage => {
+      if (preMessage.length === 0) {
+        return [{
+          content: 'Request failed, please refresh the page and try again.',
+          role: 'assistant',
+          timestamp: new Date(),
+        }]
+      }
+
+      return preMessage.map(msg => {
+        if (msg.content === 'loading' && msg.role === 'assistant') {
+          return { ...msg, content: 'Request failed, please refresh the page and try again.' }
+        }
+        return msg
+      })
+    })
+  }
+
+  const handleSend = useCallback(async (value?: string) => {
+    const inputValue = value || input.trim()
+    if (inputValue) {
       const userNewMessage: IMessage = {
         role: 'user',
-        content: input,
+        content: inputValue,
         timestamp: new Date(),
       }
   
@@ -46,12 +72,22 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
 
       setMessages((prevMessages) => [...prevMessages, userNewMessage, loadingMessage])
       setInput('')
+
+      setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
   
       try {
         const requestPayload = JSON.stringify({
           messages: [...messages, userNewMessage],
         })
         const response = await fetchChatApi(botId, requestPayload)
+        
+        if (!response || !response?.ok) {
+          handleErrorMessage()
+          return toast.error(response?.statusText || 'Data fetch failed!')
+        }
+
         const stream = response.body
         if (!stream) return
   
@@ -88,11 +124,17 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
               return updatedMessages
             })
 
+            setTimeout(() => {
+              chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+            }, 100)
+
             return
           }
   
           let chunkString = decoder.decode(value)
-          chunkString = chunkString.replace(/ +/g, ' ').replace(/\s*'\s*/g, "'").replace(/`/g, '')
+          // TODO:
+          //console.log('chunkString', chunkString)
+          //chunkString = chunkString.replace(/ +/g, ' ').replace(/\s*'\s*/g, "'").replace(/`/g, '')
           assistantContent += chunkString
           readChunk()
         }
@@ -113,6 +155,12 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
         messages: [],
       })
       const response = await fetchChatApi(botId, requestPayload)
+
+      if (!response || !response?.ok) {
+        handleErrorMessage()
+        return toast.error(response?.statusText || 'Data fetch failed!')
+      }
+
       const stream = response.body
       if (!stream) return
       
@@ -127,6 +175,16 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
             assistantContent.matchAll(MESSAGE_FILTER_REGEX),
             match => match[1].trim() 
           )
+          
+          const quickActionArray = Array.from(
+            assistantContent.matchAll(MESSAGE_JSON_FILTER_REGEX),
+            match => match[1].trim() 
+          )
+
+          if (quickActionArray && quickActionArray.length > 0) {
+            setQuickActions(quickActionArray[0])
+          }
+
           const newMessages: IMessage[] = []
           messagesArray.map(message => {
             newMessages.push({
@@ -155,11 +213,8 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
   }, [botId])
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  useEffect(() => {
     setMessages([])
+    setQuickActions('')
   }, [botId])
 
   useEffect(() => {
@@ -171,12 +226,11 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
   return (
     <ChatContainer>
       <ChatDisplay>
-        {messages.length === 0 ? <div className="message"><LoadingAnimation /></div> : messages.map((message, index) => (
-          <MessageItemComponent
-            key={`${message.role}-${message.timestamp.getTime()}-${index}`}
-            message={message}
-          />
-        ))}
+        <MessageComponent
+          messages={messages}
+          quickActions={quickActions}
+          handleSend={handleSend}
+        />
         <div id="chatbot-container-bottom" style={{height: 20}} ref={chatEndRef} />
       </ChatDisplay>
       <ChatInputContainer>
@@ -187,7 +241,9 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
         />
-        <SubmitMessageButton onClick={handleSend}>Submit</SubmitMessageButton>
+        <SubmitMessageButton onClick={() => handleSend()}>
+          <SendOutlined />
+        </SubmitMessageButton>
       </ChatInputContainer>
     </ChatContainer>
   )

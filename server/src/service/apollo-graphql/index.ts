@@ -1,5 +1,6 @@
 import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled'
 import { GraphQLError } from 'graphql'
 import { Express, Request, Response } from 'express'
 import { typeDefs } from '../../schema'
@@ -10,6 +11,7 @@ export const startApolloServer = async (express: Express) => {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
+    plugins: [process.env.ENVIRONMENT !== 'local' ? ApolloServerPluginLandingPageDisabled() : {}],
   })
 
   await apolloServer.start()

@@ -5,10 +5,12 @@ import type { FormProps } from 'antd'
 import { Checkbox, Form, Input, Radio, Select, Divider } from 'antd'
 import { QuestionCircleOutlined, LoadingOutlined } from '@ant-design/icons'
 import toast from 'react-hot-toast'
+import MDEditor from '@uiw/react-md-editor'
+import rehypeSanitize from 'rehype-sanitize'
 import { IBotIntents, TBotIntentHandlerType } from '../../context/type'
 import { useGlobalStateContext } from '../../context/global-state'
 import { themeConfig } from '../../theme/config'
-import { Container, LeftContainer, RightContainer } from './styled'
+import { Container, LeftContainer, RightContainer, MarkdownEditorContainer } from './styled'
 import CodeEditor, { ICodeEditorRef } from '../code-editor'
 import { updateIntentHandler } from '../../misc/apollo-queries/update-intent-handler'
 import { createIntentQuery } from '../../misc/apollo-queries/create-intent'
@@ -45,6 +47,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
   const [currentIntent, setCurrentIntent] = useState<IBotIntents | undefined>(undefined)
   const codeEditorRef = useRef<ICodeEditorRef | null>(null)
   const [codeLoaded, setCodeLoaded] = useState<boolean>(false)
+  const [handlerContentMarkdown, setHandlerContentMarkdown] = useState<string>('')
   const [typeOfAction, setTypeOfAction] = useState<'create' | 'update'>('update')
   const [form] = Form.useForm()
   const [
@@ -91,6 +94,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
           'intentHandlerContent': '',
           'intentHandlerGuidelines': '',
         })
+        setHandlerContentMarkdown('')
       } else {
         setTypeOfAction('update')
         form.setFieldsValue({
@@ -98,6 +102,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
           'intentHandlerContent': intent.intentHandler?.content,
           'intentHandlerGuidelines': intent.intentHandler?.guidelines || '',
         })
+        setHandlerContentMarkdown(intent.intentHandler?.content || '')
       }
       setCurrentIntent(intent)
       setCodeLoaded(false)
@@ -395,7 +400,21 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
               display: formIntentHandlerType === 'NONFUNCTIONAL' ? 'block' : 'none'
             }}
           >
-            <Input.TextArea style={{height: 200}}/>
+            <MarkdownEditorContainer>
+              <MDEditor
+                value={handlerContentMarkdown}
+                onChange={(value = '') => {
+                  setHandlerContentMarkdown(value)
+                  form.setFieldsValue({
+                    'intentHandlerContent': value
+                  })
+                }}
+                previewOptions={{
+                  rehypePlugins: [[rehypeSanitize]],
+                }}
+                height={500}
+              />
+            </MarkdownEditorContainer>
           </Form.Item>
 
           {

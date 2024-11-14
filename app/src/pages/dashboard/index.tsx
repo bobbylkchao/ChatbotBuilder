@@ -11,14 +11,12 @@ const DashboardPage = (): React.ReactElement => {
   return (
     <AuthWrapper>
       <Container>
-        <p>
-          <HeaderH2
-            style={{
-              color: themeConfig.textColor.lighter,
-              fontWeight: 'bold',
-            }}
-          >Welcome</HeaderH2>
-        </p>
+        <HeaderH2
+          style={{
+            color: themeConfig.textColor.lighter,
+            fontWeight: 'bold',
+          }}
+        >Welcome</HeaderH2>
         <p><i>This page is still under development</i></p>
         <p><a href='https://medium.com/@bobbylkchao/list/blueprint-ai-dev-logs-2d5f1cebac1b' target='_blank'>Development logs</a></p>
       </Container>

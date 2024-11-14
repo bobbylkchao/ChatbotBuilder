@@ -10,6 +10,7 @@ export const generalQuestionFlow = async (messages: IMessage, botData: TBotData,
     content: `
     ===============
     Global Guidelines:
+      Important: If your answer is going to be in markdown format, please do not return Header 1, which is '#'.
       ${botData?.guidelines || ''}
     ===============
     `

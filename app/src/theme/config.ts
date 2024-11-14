@@ -10,7 +10,8 @@ export const themeConfig = {
     primary: '#030303',
     lighter: '#1f1f1f',
     xLighter: '#3F3F3F',
-    xxLighter: '#f4f6f8',
+    xxLighter: '#fefefe',
+    xxxLighter: '#f6f6f6',
   },
   textColor: {
     primary: '#ffffff',
@@ -21,5 +22,7 @@ export const themeConfig = {
     default: '16px',
     large: '18px',
     xLarge: '24px',
+    small: '14px',
+    smaller: '12px',
   },
 }

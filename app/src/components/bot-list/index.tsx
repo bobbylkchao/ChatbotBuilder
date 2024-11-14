@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Table, Space, Button, Popconfirm, Popover } from "antd"
-import { PlusOutlined, SettingOutlined, CloseOutlined, LoadingOutlined } from "@ant-design/icons"
+import { PlusOutlined, SettingOutlined, CloseOutlined, LoadingOutlined, ExportOutlined } from "@ant-design/icons"
 import type { TableProps } from 'antd'
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@apollo/client"
@@ -94,7 +94,19 @@ const BotList = (): React.ReactElement => {
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
-      defaultSortOrder: 'descend',
+    },
+    {
+      title: 'Public URL',
+      dataIndex: 'publicUrl',
+      key: 'publicUrl',
+      render: (_, record) => (
+        <Popover content="Open chatbot in new tab and copy public url">
+          <a
+            href={`/chat/${record.id}`}
+            target='_blank'
+          ><ExportOutlined /></a>
+        </Popover>
+      ),
     },
     {
       title: 'Action',

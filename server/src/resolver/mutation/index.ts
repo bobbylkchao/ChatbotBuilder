@@ -4,6 +4,7 @@ import { handleDeleteIntent } from "./delete-intent"
 import { handleUpdateBot } from "./update-bot"
 import { handleCreateBot } from "./create-bot"
 import { handleDeleteBot } from "./delete-bot"
+import { handleCreateQuickAction } from "./create-quick-action"
 
 export const mutationResolvers = {
   Mutation: {
@@ -13,5 +14,6 @@ export const mutationResolvers = {
     updateBot: handleUpdateBot,
     createBot: handleCreateBot,
     deleteBot: handleDeleteBot,
+    createQuickAction: handleCreateQuickAction,
   },
 }
