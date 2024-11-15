@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
+    "prod:start": "npm run compile",
     "dev": "nodemon",
     "lint": "eslint"
   },
@@ -46,6 +47,7 @@
     "eslint-plugin-promise": "^6.6.0",
     "globals": "^15.11.0",
     "nodemon": "^3.1.7",
+    "pm2": "^5.4.3",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript-eslint": "^8.12.2"
