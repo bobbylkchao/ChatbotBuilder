@@ -14,7 +14,7 @@ export const corsMiddleware = (): RequestHandler => {
       origin,
       apiDomain,
       path: req.path,
-    }, 'Received api request')
+    }, 'API request - Received')
 
     if (!origin) {
       if (req.path === '/graphql' && process.env.ENVIRONMENT === 'local') {
@@ -42,7 +42,8 @@ export const corsMiddleware = (): RequestHandler => {
     // Allow requests from the same domain (origin matches the API domain)
     if (removeProtocol(origin) === apiDomain) {
       res.header('Access-Control-Allow-Origin', origin)
-      return next()  // Call next() to pass control to the next middleware
+      next()  // Call next() to pass control to the next middleware
+      return
     }
 
     // Handle allowed origins
@@ -53,6 +54,11 @@ export const corsMiddleware = (): RequestHandler => {
     }
 
     // For other cases, return Forbidden response
+    logger.info({
+      origin,
+      apiDomain,
+      path: req.path,
+    }, 'API request - Denied')
     res.status(403).json({ error: 'Forbidden' })  // Return a 403 Forbidden response
     return
   }
