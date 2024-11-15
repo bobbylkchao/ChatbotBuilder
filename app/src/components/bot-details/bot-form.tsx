@@ -232,7 +232,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           }
           name='allowedOrigin'
           rules={[{
-            required: true,
             pattern: /^(https?:\/\/[a-zA-Z0-9.-]+(:\d+)?)(,\s*https?:\/\/[a-zA-Z0-9.-]+(:\d+)?)*$/,
             message: 'Allowed origins format is incorrect!',
           }]}
@@ -314,7 +313,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
         handleOk={() => setIsAllowedOriginModalOpen(false)}
         disableCancelButton={true}
       >
-        <p>Configure allowed origins to specify which domains can access your resources. This ensures secure and controlled cross-origin requests.</p>
+        <p>Configure allowed origins to specify which domains can access your resources. This ensures secure and controlled cross-origin requests. This is not required, if you do not configure it, all origins will be allowed to access and request your chatbot.</p>
 
         <p><b>Input Format Guidelines</b></p>
 

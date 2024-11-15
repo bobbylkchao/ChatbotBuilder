@@ -25,11 +25,19 @@ export const chatBotServiceEntry = async (
   }
 
   // Get bot's allowed origins setting
-  const requestOrigin = (req?.headers?.origin || req?.headers?.referer) || ''
-  const isTrafficAllowed = botData.allowedOrigin.includes(requestOrigin)
-  if (!isTrafficAllowed) {
-    res.status(403).json({ error: 'Traffic is not allowed' })
-    return
+  // If not config, allowed all traffic
+  if (botData.allowedOrigin.length > 0) {
+    const requestOrigin = (req?.headers?.origin || req?.headers?.referer) || ''
+    const isTrafficAllowed = botData.allowedOrigin.includes(requestOrigin)
+    if (!isTrafficAllowed) {
+      logger.info({
+        botId,
+        requestOrigin,
+        allowedOrigins: botData.allowedOrigin,
+      }, 'Traffic is not allowed')
+      res.status(403).json({ error: 'Traffic is not allowed' })
+      return
+    }
   }
 
   // First message and send a greeting message

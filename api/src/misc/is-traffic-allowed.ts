@@ -3,7 +3,6 @@ interface IIsTrafficAllowedReturn {
   authToken: null | string
 }
 
-// TODO: check graphql 
 export const isTrafficAllowed = (origin: string, authToken: string): IIsTrafficAllowedReturn => {
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
   const isNonProdApolloStudio = process.env.ENVIRONMENT === 'local' && origin === `http://localhost:${process.env.PORT || 4000}`
