@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "prod:start": "npm run compile",
+    "build": "npm run compile",
     "dev": "nodemon",
     "lint": "eslint"
   },
@@ -38,6 +38,8 @@
     "@eslint/js": "^9.13.0",
     "@types/express": "^5.0.0",
     "@types/graphql": "^14.2.3",
+    "@types/minimist": "^1.2.5",
+    "@types/normalize-package-data": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^8.12.2",
     "@typescript-eslint/parser": "^8.12.2",
     "eslint": "^8.57.1",

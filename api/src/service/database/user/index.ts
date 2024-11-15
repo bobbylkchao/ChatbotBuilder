@@ -29,7 +29,7 @@ export const getUser = async (openId: string, email: string) => {
   }
 }
 
-export const createUser = async (args: Prisma.UserUncheckedCreateInput): Promise<User> => {
+export const createUser = async (args: Prisma.UserUncheckedCreateInput) => {
   try {
     const createUserQuery = await prisma.user.create({
       data: {

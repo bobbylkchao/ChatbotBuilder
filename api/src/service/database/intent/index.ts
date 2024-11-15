@@ -2,12 +2,13 @@ import { Prisma, Intent, IntentHandler } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
-interface IUpdateIntent extends Prisma.IntentUncheckedUpdateInput {
+interface IUpdateIntent extends Omit<Prisma.IntentUncheckedUpdateInput, 'id' | 'intentHandler'> {
   userId: string
+  id: string
   intentHandler: Prisma.IntentHandlerUncheckedUpdateWithoutIntentHandlerInput
 }
 
-interface ICreateIntent extends Prisma.IntentUncheckedCreateInput {
+interface ICreateIntent extends Omit<Prisma.IntentUncheckedCreateInput, 'intentHandler'> {
   userId: string
   botId: string
   intentHandler: Prisma.IntentHandlerUncheckedCreateInput
@@ -81,7 +82,7 @@ export const updateIntent = async ({
       },
     })
   
-    return updateIntentQuery
+    return updateIntentQuery as IIntentAndHandler
   } catch (err) {
     logger.error(err, 'Encountered an error when updating intent')
     throw err
@@ -147,7 +148,7 @@ export const createIntent = async ({
       },
     })
   
-    return createIntentQuery
+    return createIntentQuery as IIntentAndHandler
   } catch (err) {
     logger.error(err, 'Encountered an error when creating intent')
     throw err

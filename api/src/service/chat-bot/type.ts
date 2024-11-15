@@ -3,7 +3,7 @@ import { EHandlerType } from '@prisma/client'
 import { getBotGuildlinesAndIntent } from '../database/bot'
 
 export interface IMessage {
-  role: 'user' | 'system' | 'assistant',
+  role: 'user' | 'system' | 'assistant'
   content: string
 }
 
@@ -34,16 +34,16 @@ export interface IIntentConfig {
 export interface IIntentDetails {
   intentName?: string,
   intentSummary?: string,
-  parameters?: string,
+  parameters?: Record<string, any>
 }
 
 export interface IIntentDetectionFormat {
   code?: string
   strictIntentDetection?: boolean
-  questionToUser?: string,
-  intentName?: string,
-  intentSummary?: string,
-  parameters?: Record<string, any>,
+  questionToUser?: string
+  intentName?: string
+  intentSummary?: string
+  parameters?: Record<string, any>
 }
 
 export interface IIntentDetectionReturn {

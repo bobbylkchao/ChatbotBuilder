@@ -12,9 +12,9 @@ export const intentDetectionFlow = async (
   userInput: string,
 ): Promise<IIntentDetectionReturn> => {
   try {
-    const botGlobalGuidelines = botData.guidelines || 'None'
-    const botIntents = botData.botIntents
-    const isStrictIntentDetectionEnabled = botData.strictIntentDetection
+    const botGlobalGuidelines = botData?.guidelines || 'None'
+    const botIntents = botData?.botIntents
+    const isStrictIntentDetectionEnabled = botData?.strictIntentDetection
 
     // Check if intent of user's question is clear
     const intentClarity = await checkIntentClarity(botGlobalGuidelines, chatHistory)
@@ -23,14 +23,14 @@ export const intentDetectionFlow = async (
     // If 'strictIntentDetection' field in bot table is true
     if (!intentClarity.isIntentClear && isStrictIntentDetectionEnabled) {
       return {
-        intents: {
+        intents: [{
           code: intentDetectionFlowReturnCode.INTENT_UN_CLEAR,
           questionToUser: intentClarity.questionToUser || 'Could you please clarify your question?'
-        }
+        }]
       }
     }
 
-    const intentListFormatted = botIntents.length > 0 ? botIntents.map(
+    const intentListFormatted = botIntents && botIntents?.length > 0 ? botIntents.map(
       intent => `'intent name: ${intent.name}, intent required fields: ${intent.requiredFields || '\'\''}'`
     ).join('\n') : 'INTENT NOT CONFIGURED'
 

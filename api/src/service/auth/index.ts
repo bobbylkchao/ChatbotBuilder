@@ -13,6 +13,12 @@ const unAuthenticatedError = new GraphQLError('User is not authenticated', {
 
 type TAuthReturn = Promise<User | null>
 
+interface IGoogleReturn {
+  sub?: string
+  email?: string
+  name?: string
+}
+
 export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuthReturn => {
   try {
     if (!authToken) {
@@ -21,7 +27,7 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
       }
     }
 
-    let result = {}
+    let result: IGoogleReturn = {}
     let openId = ''
     let email = ''
     let name = ''

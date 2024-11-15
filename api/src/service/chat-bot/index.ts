@@ -28,7 +28,8 @@ export const chatBotServiceEntry = async (
   const requestOrigin = (req?.headers?.origin || req?.headers?.referer) || ''
   const isTrafficAllowed = botData.allowedOrigin.includes(requestOrigin)
   if (!isTrafficAllowed) {
-    return res.status(403).json({ error: 'Traffic is not allowed' })
+    res.status(403).json({ error: 'Traffic is not allowed' })
+    return
   }
 
   // First message and send a greeting message
@@ -40,18 +41,15 @@ export const chatBotServiceEntry = async (
       res.write(messageResponseFormatJson(botData.botQuickActions.config))
     }
 
-    return res.end()
+    res.end()
+    return
   }
 
   const recentMessage = messages[messages.length-1] as IMessage
   if (recentMessage.role === 'system') {
-    return res.status(400).json({ message: 'The most recent message is from system instead of user' })
+    res.status(400).json({ message: 'The most recent message is from system instead of user' })
+    return 
   }
-
-  // TODO: Filter messages, delete unnecessary fields
-  messages.forEach(message => {
-    delete message.componentItem
-  })
 
   logger.info({
     history: messages,

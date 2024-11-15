@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { Request, Response, RequestHandler } from 'express'
+import { RequestHandler } from 'express'
 import { param, body, validationResult } from 'express-validator'
 import logger from '../misc/logger'
 import { openAiClient, getModel } from '../service/open-ai'
@@ -7,16 +7,18 @@ import { chatBotServiceEntry } from '../service/chat-bot'
 import { IMessage } from '../service/chat-bot/type'
 import { messageResponseFormat } from '../service/chat-bot/misc/message-response-format'
 
-export const chatMiddleware = async (req: Request, res: Response) => {
+export const chatMiddleware: RequestHandler = async (req, res) => {
   const botId = req.params.botId
   if (!botId) {
-    return res.status(400).json({ error: 'botId is required' });
+    res.status(400).json({ error: 'botId is required' })
+    return
   }
 
   const { messages }: { messages: IMessage[] } = req.body
 
   if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ message: 'OpenAI API key is missing' })
+    res.status(500).json({ message: 'OpenAI API key is missing' })
+    return
   }
 
   res.setHeader('Content-Type', 'text/event-stream')
@@ -35,7 +37,8 @@ export const chatMiddleware = async (req: Request, res: Response) => {
 export const validatorHandler: RequestHandler = (req, res, next) => {
   const error = validationResult(req).mapped()
   if (Object.keys(error).length > 0) {
-    return res.status(500).json({ message: 'Validation error', error })
+    res.status(400).json({ message: 'Validation error', error })
+    return
   }
   next()
 }

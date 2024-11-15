@@ -3,7 +3,7 @@ import { openAiClient, getModel } from "../../open-ai"
 import { MESSAGE_START, MESSAGE_END } from "../misc/message-response-format"
 import { IMessage, TBotData } from "../type"
 
-export const generalQuestionFlow = async (messages: IMessage, botData: TBotData, res: Response) => {
+export const generalQuestionFlow = async (messages: IMessage[], botData: TBotData, res: Response) => {
   // Bot's guidelines
   messages.unshift({
     role: 'system',

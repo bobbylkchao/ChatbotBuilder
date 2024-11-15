@@ -4,13 +4,21 @@ import { IIntentHandlerFlow } from "./intent-handler-flow"
 import { MESSAGE_START, MESSAGE_END } from "../misc/message-response-format"
 import { IMessage, TBotData } from "../type"
 
+interface IModelResponseFlow {
+  userInput: string
+  chatHistory: string
+  botGuidelines: string
+  intentHandlerGuidelines: string
+  res: Response
+}
+
 export const modelResponseFlow = async ({
   userInput,
   chatHistory,
   botGuidelines,
   intentHandlerGuidelines,
   res,
-}: IIntentHandlerFlow) => {
+}: IModelResponseFlow) => {
   const stream = await openAiClient.chat.completions.create(
     {
       model: getModel(),

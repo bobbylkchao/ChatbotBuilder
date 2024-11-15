@@ -26,14 +26,14 @@ export const intentHandlerFlow = async ({
 }: IIntentHandlerFlow) => {
   const {
     id: intentHandlerId,
-    guidelines: intentHandlerGuidelines = '',
+    guidelines,
     type: intentHandlerType,
     content: intentHandlerContent = '',
   } = intentHandler
 
   if (intentHandlerType === 'NONFUNCTIONAL') {
     logger.info({ intentHandlerId }, 'NONFUNCTIONAL response')
-    res.write(messageResponseFormat(intentHandlerContent))
+    res.write(messageResponseFormat(intentHandlerContent || ''))
   }
   
   if (intentHandlerType === 'FUNCTIONAL') {
@@ -46,7 +46,7 @@ export const intentHandlerFlow = async ({
       response: res,
       fetch: fetch,
     }
-    const decodedFunction = functionalHandler(intentHandlerContent, contextInSandbox)
+    const decodedFunction = functionalHandler(intentHandlerContent || '', contextInSandbox)
 
     let sandboxResult = ''
     try {
@@ -64,7 +64,7 @@ export const intentHandlerFlow = async ({
       userInput,
       chatHistory,
       botGuidelines,
-      intentHandlerGuidelines,
+      intentHandlerGuidelines: guidelines || '',
       res,
     })
   }
