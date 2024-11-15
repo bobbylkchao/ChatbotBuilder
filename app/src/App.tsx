@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { ApolloProvider } from '@apollo/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Toaster } from 'react-hot-toast'
-import { config } from './config'
 import { apolloClient } from './service/apollo'
 import { GlobalStateProvider } from './context/global-state'
 import SignInPage from './pages/sign-in'
@@ -19,7 +18,7 @@ function App() {
     <div style={{overflow: 'hidden'}}>
       <GlobalStateProvider>
         <ApolloProvider client={apolloClient}>
-          <GoogleOAuthProvider clientId={config.GOOGLE_AUTH_CLIENT_ID}>
+          <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID || ''}>
             <Router>
               <Routes>
                 <Route path="/" element={<SignInPage />} />

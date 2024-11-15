@@ -1,8 +1,6 @@
-import { config } from "../../config"
-
 export const fetchChatApi = async (botId: string, requestPayload: string): Promise<Response | null> => {
   try {
-    const response = await fetch(`${config.API_CHAT_STREAM_URL}/${botId}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_CHAT_STREAM_URL}/${botId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

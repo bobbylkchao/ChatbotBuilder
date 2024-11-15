@@ -2,14 +2,13 @@ import React from "react"
 import { Wrapper } from "../../components/wrapper/styled"
 import { HeaderH1, HeaderH2 } from "../../components/header/styled"
 import GoogleSignIn from "../../components/google-sign-in"
-import { config } from "../../config"
 
 const SignInPage = (): React.ReactElement => {
-  document.title = config.APP_NAME
+  document.title = process.env.REACT_APP_APP_NAME || ''
   return (
     <Wrapper>
-      <HeaderH1>{ config.APP_NAME }</HeaderH1>
-      <HeaderH2>{ config.APP_DESC }</HeaderH2>
+      <HeaderH1>{ process.env.REACT_APP_APP_NAME }</HeaderH1>
+      <HeaderH2>{ process.env.REACT_APP_APP_DESC }</HeaderH2>
       <GoogleSignIn />
     </Wrapper>
   )
