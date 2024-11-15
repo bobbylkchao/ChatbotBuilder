@@ -1,7 +1,6 @@
 import React from 'react'
 import { useGlobalStateContext } from '../../context/global-state'
 import AuthWrapper from '../../components/auth-wrapper'
-import { config } from '../../config'
 import { Container } from './styled'
 import { HeaderH2 } from '../../components/header/styled'
 import { themeConfig } from '../../theme/config'

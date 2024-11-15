@@ -1,6 +1,5 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { config } from '../config'
 
 export const setAuthorizationToken = (token: string): void => {
   sessionStorage.setItem('authorizationToken', token)
@@ -15,7 +14,7 @@ interface IApolloContextHeaders {
 }
 
 const httpLink = createHttpLink({
-  uri: config.API_GRAPHQL_URL,
+  uri: process.env.REACT_APP_API_GRAPHQL_URL,
 })
 
 const authLink = setContext((_, { headers }) => {

@@ -7,7 +7,6 @@ import {
   InputField,
   SubmitMessageButton,
 } from './styled'
-import { config } from '../../config'
 import { IMessage, IChatStreamReturn } from './types'
 import MessageItemComponent from './message-item-component'
 import LoadingAnimation from '../loading-animation'
