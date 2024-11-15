@@ -21,5 +21,13 @@ export const StyledRightContainer = styled.div`
   height: 100vh;
   padding: 0 15px;
   background-color: #ffffff;
-  color: ${themeConfig.textColor.lighter}
+  color: ${themeConfig.textColor.lighter};
+`
+
+export const VersionContainer = styled.span`
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: ${themeConfig.textColor.primary};
 `
