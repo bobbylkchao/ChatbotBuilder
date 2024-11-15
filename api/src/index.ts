@@ -12,15 +12,18 @@ config()
 
 const runPrismaMigrations = () => {
   logger.info("Running Prisma migrations...")
-  exec("npx prisma migrate deploy", (error, stdout, stderr) => {
+  exec("PRISMA_HIDE_UPDATE_MESSAGE=true npx prisma migrate deploy", (error, stdout, stderr) => {
     if (error) {
-      logger.error(error, 'Error running migrations')
+      logger.error('Error running migrations')
+      logger.error(error)
       process.exit(1)
     }
     if (stderr) {
-      logger.error(stderr, 'Migration stderr')
+      logger.error('Migration stderr')
+      logger.error(stderr)
     }
-    console.log(stdout, 'Migration completed')
+    logger.info(stdout, 'Migration completed')
+    logger.info(stdout)
     startServices()
   })
 }
