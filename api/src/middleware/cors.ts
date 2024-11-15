@@ -45,8 +45,8 @@ export const corsMiddleware = (): RequestHandler => {
       return next()  // Call next() to pass control to the next middleware
     }
 
-    // Handle allowed origins in the development environment
-    if (process.env.ENVIRONMENT === 'local' && allowedOrigins.includes(origin)) {
+    // Handle allowed origins
+    if (allowedOrigins.includes(origin)) {
       res.header('Access-Control-Allow-Origin', origin)
       next()  // Call next() to pass control to the next middleware
       return
