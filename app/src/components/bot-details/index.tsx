@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Collapse, Button } from 'antd'
+import { Collapse, Button, Space, Switch } from 'antd'
 import { PlusOutlined, CheckOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { IUserBots } from '../../context/type'
 import { useGlobalStateContext } from '../../context/global-state'
@@ -12,6 +12,7 @@ import BotForm from './bot-form'
 import BotIntentList from '../bot-intent-list'
 import BotQuickAction from '../bot-quick-action'
 import Modal from '../modal'
+import { BotIntentHeaderContainer, BotIntentHeaderLeft } from './styled'
 
 const BotDetails = (): React.ReactElement => {
   const { botId = '' } = useParams()
@@ -56,13 +57,17 @@ const BotDetails = (): React.ReactElement => {
         items={[{
           key: 'botIntentConfigurations',
           label: (
-            <span>
-              <b>Bot Intents </b>
-              <QuestionCircleOutlined onClick={(event) => {
-                event.stopPropagation()
-                setIsBotIntentTipsModalOpen(true)
-              }} title="Tips"/>
-            </span>
+            <BotIntentHeaderContainer>
+              <BotIntentHeaderLeft>
+                <span>
+                  <b>Bot Intents </b>
+                  <QuestionCircleOutlined onClick={(event) => {
+                    event.stopPropagation()
+                    setIsBotIntentTipsModalOpen(true)
+                  }} title="Tips"/>
+                </span>
+              </BotIntentHeaderLeft>
+            </BotIntentHeaderContainer>
           ),
           children: <BotIntentList botId={currentBot.id}/>,
         }]}
@@ -84,7 +89,7 @@ const BotDetails = (): React.ReactElement => {
               }} title="Tips"/>
             </span>
           ),
-          children: <BotQuickAction quickAction={currentBot.botQuickActions} botId={currentBot.id}/>,
+          children: <BotQuickAction quickAction={currentBot.botQuickActions} botId={currentBot.id} toggleTipsModal={() => setIsBotQuickActionsTipsModalOpen(!isBotQuickActionsTipsModalOpen)}/>,
         }]}
         defaultActiveKey={['botQuickActionConfigurations']}
         style={{

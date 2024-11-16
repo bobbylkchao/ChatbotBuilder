@@ -31,7 +31,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
   const [form] = Form.useForm()
   const [isGreetingMessageModalOpen, setIsGreetingMessageModalOpen] = useState<boolean>(false)
   const [isGlobalGuidelinesModalOpen, setIsGlobalGuidelinesModalOpen] = useState<boolean>(false)
-  const [isStrictIntentDetectionModalOpen, setIsStrictIntentDetectionModalOpen] = useState<boolean>(false)
   const [isAllowedOriginModalOpen, setIsAllowedOriginModalOpen] = useState<boolean>(false)
   const [
     submitUpdateBotHandler,
@@ -54,8 +53,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
   const formBotName: string = Form.useWatch('name', form)
   const formGreetingMessage: string = Form.useWatch('greetingMessage', form)
   const formGuidelines: string = Form.useWatch('guidelines', form)
-  const formStrictIntentDetection: boolean = Form.useWatch('strictIntentDetection', form)
-  const formAllowedOrigin = Form.useWatch('allowedOrigin', form)
+  const formAllowedOrigin: string = Form.useWatch('allowedOrigin', form)
 
   const onSubmit = async (): Promise<void> => {
     form.validateFields()
@@ -69,7 +67,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
                 botName: formBotName,
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
-                strictIntentDetection: formStrictIntentDetection,
                 allowedOrigin:  formAllowedOrigin ? formAllowedOrigin.split(',') : [],
               },
             })
@@ -80,7 +77,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
                 botName: formBotName,
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
-                strictIntentDetection: formStrictIntentDetection,
                 allowedOrigin: formAllowedOrigin ? formAllowedOrigin.split(',') : [],
               },
             })
@@ -102,6 +98,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
     if (submitUpdateBotHandlerResult || submitCreateBotHandlerResult) {
       if (botData?.id) {
         // Update bot
+        const formatAllowedOrigin = formAllowedOrigin ? formAllowedOrigin.split(',') : []
         setUser((prevUser) => {
           if (!prevUser) return prevUser
           return {
@@ -113,8 +110,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
                     name: formBotName,
                     guidelines: formGuidelines,
                     greetingMessage: formGreetingMessage,
-                    strictIntentDetection: formStrictIntentDetection,
-                    allowedOrigin: formAllowedOrigin,
+                    allowedOrigin: formatAllowedOrigin,
                     updatedAt: submitUpdateBotHandlerResult.updateBot.updatedAt,
                   }
                 : bot
@@ -123,6 +119,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
         })
         toast.success('Bot updated!')
       } else {
+        const formatAllowedOrigin = formAllowedOrigin ? formAllowedOrigin.split(',') : []
         // Create bot
         setUser((prevUser) => {
           if (!prevUser) return prevUser
@@ -136,8 +133,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
                 guidelines: formGreetingMessage,
                 botIntents: [],
                 greetingMessage: formGreetingMessage,
-                strictIntentDetection: formStrictIntentDetection,
-                allowedOrigin: formAllowedOrigin,
+                allowedOrigin: formatAllowedOrigin,
                 createdAt: submitCreateBotHandlerResult.createBot.createdAt,
                 updatedAt: submitCreateBotHandlerResult.createBot.updatedAt,
               },
@@ -152,6 +148,20 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
     submitUpdateBotHandlerResult,
     submitCreateBotHandlerResult,
   ])
+
+  useEffect(() => {
+    if (botData) {
+      if (!botData.allowedOrigin || botData.allowedOrigin?.length === 0) {
+        form.setFieldsValue({
+          'allowedOrigin': '',
+        })
+      } else {
+        form.setFieldsValue({
+          'allowedOrigin': botData.allowedOrigin.join(),
+        })
+      }
+    }
+  }, [botData])
 
   useImperativeHandle(ref, () => ({
     getForm: () => form,
@@ -211,19 +221,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           name='guidelines'
         >
           <Input.TextArea style={{height: 200}}/>
-        </Form.Item>
-
-        <Form.Item
-          label={
-            <span>Strict Intent Detection <QuestionCircleOutlined onClick={() => setIsStrictIntentDetectionModalOpen(true)} title="Tips"/></span>
-          }
-          name='strictIntentDetection'
-          rules={[{ required: true, message: 'Please select strict intent detection option!' }]}
-        >
-          <Radio.Group>
-            <Radio value={true}>Enable</Radio>
-            <Radio value={false}>Disable</Radio>
-          </Radio.Group>
         </Form.Item>
 
         <Form.Item
@@ -297,23 +294,15 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
       </Modal>
 
       <Modal
-        title='Strict Intent Detection'
-        isModalOpen={isStrictIntentDetectionModalOpen}
-        handleCancel={() => setIsStrictIntentDetectionModalOpen(false)}
-        handleOk={() => setIsStrictIntentDetectionModalOpen(false)}
-        disableCancelButton={true}
-      >
-        <p>When <i><b>strict_intent_detection</b></i> is enabled, the chatbot will not be allowed to answer freely, but will return something like “Sorry, I don't know”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>
-      </Modal>
-
-      <Modal
         title='Allowed Origins'
         isModalOpen={isAllowedOriginModalOpen}
         handleCancel={() => setIsAllowedOriginModalOpen(false)}
         handleOk={() => setIsAllowedOriginModalOpen(false)}
         disableCancelButton={true}
       >
-        <p>Configure allowed origins to specify which domains can access your resources. This ensures secure and controlled cross-origin requests. This is not required, if you do not configure it, all origins will be allowed to access and request your chatbot.</p>
+        <p>This <b>Allowed Origins</b> setting is typically used when embedding your chatbot into other apps or websites, such as via an iframe.</p>
+        <p>Configure allowed origins to specify which domains can access your resources. This ensures secure and controlled cross-origin requests.</p>
+        <p>This is optional, if not configured, requests from all origins will be allowed to access your chatbot.</p>
 
         <p><b>Input Format Guidelines</b></p>
 
@@ -325,7 +314,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
 
         <p><b>Examples</b></p>
         <pre>https://www.example.com</pre>
-        <pre>http://www.a.com, https://b.com</pre>
+        <pre>http://www.a.com,https://b.com</pre>
       </Modal>
     </Container>
   )

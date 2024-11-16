@@ -50,7 +50,7 @@ export interface IUserBots {
   createdAt: string
   updatedAt: string
   greetingMessage: string
-  strictIntentDetection: boolean
+  strictIntentDetection?: boolean
   botQuickActions?: IBotQuickAction
 }[]
 

@@ -11,7 +11,6 @@ export const handleUpdateBot = async (_, args, context) => {
     botName: args.botName,
     greetingMessage: args.greetingMessage,
     guidelines: args.guidelines,
-    strictIntentDetection: args.strictIntentDetection,
     allowedOrigin: args.allowedOrigin,
   })
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Table, Space, Popover, Popconfirm, Button, Form, Input } from "antd"
 import type { TableProps, FormProps, FormInstance } from "antd"
-import { EditOutlined, CloseOutlined, PlusOutlined, LoadingOutlined } from "@ant-design/icons"
+import { EditOutlined, CloseOutlined, PlusOutlined, LoadingOutlined, QuestionCircleOutlined } from "@ant-design/icons"
 import { useMutation } from "@apollo/client"
 import { useGlobalStateContext } from "../../context/global-state"
 import { Container, ButtonContainer } from "./styled"
@@ -12,10 +12,12 @@ import { themeConfig } from "../../theme/config"
 import { LoadingContiner } from "../loading-component"
 import { createQuickActionQuery } from "../../misc/apollo-queries/create-quick-action"
 import Modal from "../modal"
+import { gaSendClickEvent } from "../../misc/google-analytics"
 
 interface IBotQuickActionProps {
   quickAction?: IBotQuickAction
   botId: string
+  toggleTipsModal: () => void
 }
 
 interface IQuickActionFormat {
@@ -24,7 +26,7 @@ interface IQuickActionFormat {
   prompt: string
 }
 
-const BotQuickAction = ({ botId, quickAction }: IBotQuickActionProps) => {
+const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickActionProps) => {
   const [dataSource, setDataSource] = useState<IQuickActionFormat[] | []>([])
   const [currentQuickAction, setCurrentQuickAction] = useState<IQuickActionFormat | {}>({})
   const [modalTitle, setModalTitle] = useState<'Create' | 'Update'>('Create')
@@ -159,18 +161,24 @@ const BotQuickAction = ({ botId, quickAction }: IBotQuickActionProps) => {
   }
 
   useEffect(() => {
-    if (quickAction?.config) {
+    const parseQuickActions = (input: string) => {
       try {
-        const parsedQuickActions: IQuickActionFormat[] = JSON.parse(quickAction.config)
+        const parsedQuickActions: IQuickActionFormat[] = JSON.parse(input)
         if (parsedQuickActions && parsedQuickActions.length > 0) {
-          parsedQuickActions.map((item, index) => {
+          parsedQuickActions.forEach((item, index) => {
             item.key = index
           })
           setDataSource(parsedQuickActions)
         }
       } catch (err) {
-        console.error('Quick action parse failed')
+        console.error('Quick action parse failed', err)
       }
+    }
+
+    if (quickAction?.config) {
+      parseQuickActions(quickAction.config)
+    } else if (quickAction) {
+      parseQuickActions(quickAction as unknown as string)
     }
   }, [quickAction])
 
@@ -217,6 +225,7 @@ const BotQuickAction = ({ botId, quickAction }: IBotQuickActionProps) => {
             setCurrentQuickAction({})
             setIsQuickActionModalOpen(true)
             setModalTitle('Create')
+            gaSendClickEvent('button', 'Create New Quick Action')
           }}
           size='small'
         >
@@ -250,7 +259,14 @@ const BotQuickAction = ({ botId, quickAction }: IBotQuickActionProps) => {
           form={form}
         >
           <Form.Item
-            label='Display Name'
+            label={(
+              <span>
+                <b>Display Name </b>
+                <QuestionCircleOutlined onClick={() => {
+                  toggleTipsModal()
+                }} title="Tips"/>
+              </span>
+            )}
             name='displayName'
             rules={[{ required: true, message: 'Please input display name!' }]}
           >
@@ -258,7 +274,14 @@ const BotQuickAction = ({ botId, quickAction }: IBotQuickActionProps) => {
           </Form.Item>
 
           <Form.Item
-            label='Prompt'
+            label={(
+              <span>
+                <b>Prompt </b>
+                <QuestionCircleOutlined onClick={() => {
+                  toggleTipsModal()
+                }} title="Tips"/>
+              </span>
+            )}
             name='prompt'
             rules={[{ required: true, message: 'Please input prompt!' }]}
           >

@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { ApolloProvider } from '@apollo/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Toaster } from 'react-hot-toast'
 import { apolloClient } from './service/apollo'
 import { GlobalStateProvider } from './context/global-state'
+import { initGoogleAnalytics } from './misc/google-analytics'
 import SignInPage from './pages/sign-in'
 import DashboardPage from './pages/dashboard'
 import PlaygroundPage from './pages/playground'
@@ -14,6 +15,10 @@ import ChatPage from './pages/chat'
 import NotFoundPage from './pages/not-found'
 
 function App() {
+  useEffect(() => {
+    initGoogleAnalytics()
+  }, [])
+
   return (
     <div style={{overflow: 'hidden'}}>
       <GlobalStateProvider>

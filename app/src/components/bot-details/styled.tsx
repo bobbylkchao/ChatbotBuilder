@@ -16,3 +16,11 @@ export const NotFoundContainer = styled.div`
   flex-direction: column;
 `
 
+export const BotIntentHeaderContainer = styled.div`
+  display: flex;
+`
+
+export const BotIntentHeaderLeft = styled.div`
+  display: flex;
+  flex: 1;
+`

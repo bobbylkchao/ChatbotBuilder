@@ -54,7 +54,6 @@ interface IUpdateBotArgs {
   botName: string
   greetingMessage: string
   guidelines: string
-  strictIntentDetection: boolean
   allowedOrigin?: string[]
 }
 
@@ -64,7 +63,6 @@ export const updateBot = async ({
   botName,
   greetingMessage,
   guidelines,
-  strictIntentDetection,
   allowedOrigin = [],
 }: IUpdateBotArgs) => {
   try {
@@ -92,7 +90,6 @@ export const updateBot = async ({
       },
       data: {
         name: botName,
-        strictIntentDetection,
         greetingMessage,
         guidelines,
         allowedOrigin,
@@ -112,7 +109,6 @@ interface ICreateBotArgs {
   botName: string
   greetingMessage: string
   guidelines: string
-  strictIntentDetection: boolean
   allowedOrigin?: string[]
 }
 
@@ -121,7 +117,6 @@ export const createBot = async ({
   botName,
   greetingMessage,
   guidelines,
-  strictIntentDetection,
   allowedOrigin = [],
 }: ICreateBotArgs) => {
   try {
@@ -142,7 +137,6 @@ export const createBot = async ({
       data: {
         userId: userId,
         name: botName,
-        strictIntentDetection,
         greetingMessage,
         guidelines,
         allowedOrigin,
@@ -200,6 +194,46 @@ export const deleteBot = async ({
     return botId
   } catch (err) {
     logger.error(err, 'Encountered an error when deleting bot')
+    throw err
+  }
+}
+
+interface IUpdateBotStrictIntentDetectionArgs {
+  userId: string
+  botId: string
+  strictIntentDetection: boolean
+}
+
+export const updateBotStrictIntentDetection = async ({
+  userId,
+  botId,
+  strictIntentDetection,
+}: IUpdateBotStrictIntentDetectionArgs) => {
+  try {
+    const findBot = await prisma.bot.findMany({
+      where: {
+        userId: userId,
+        id: botId
+      },
+    })
+
+    if (!findBot) {
+      throw new Error('Bot not found')
+    }
+
+    const updateBotQuery = prisma.bot.update({
+      where: {
+        id: botId,
+      },
+      data: {
+        strictIntentDetection,
+        updatedAt: new Date(),
+      },
+    })
+
+    return updateBotQuery
+  } catch (err) {
+    logger.error(err, 'DB Error when updating bot StrictIntentDetection')
     throw err
   }
 }

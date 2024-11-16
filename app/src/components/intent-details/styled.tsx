@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { themeConfig } from "../../theme/config"
 
 export const Container = styled.div`
   display: flex;
@@ -13,6 +14,18 @@ export const LeftContainer = styled.div`
 export const RightContainer = styled.div`
   display: flex;
   flex: 2;
+  flex-direction: column;
+`
+
+export const EditorTipsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: ${themeConfig.backgroundColor.xxxLighter};
+  border-radius: 5px;
+  cursor: pointer;
 `
 
 export const MarkdownEditorContainer = styled.div`

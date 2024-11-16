@@ -12,4 +12,10 @@ export const ModalContent = styled.div`
     max-height: 400px;
     overflow-y: auto;
   }
+
+  code {
+    background-color: ${themeConfig.backgroundColor.xxxLighter};
+    padding: 5px;
+    border-radius: 5px;
+  }
 `

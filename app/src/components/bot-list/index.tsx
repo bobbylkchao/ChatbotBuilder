@@ -15,6 +15,7 @@ import BotForm, { IBotFormRef } from "../bot-details/bot-form"
 import { deleteBotQuery } from "../../misc/apollo-queries/delete-bot"
 import { LoadingContiner } from "../loading-component"
 import { toast } from 'react-hot-toast'
+import { gaSendClickEvent } from "../../misc/google-analytics"
 
 interface IDataType {
   key: string
@@ -115,7 +116,10 @@ const BotList = (): React.ReactElement => {
         <Space size="middle">
           <Popover content="Configure Bot">
             <SettingOutlined
-              onClick={() => navigate(`/bot/${record.id}`)}
+              onClick={() => {
+                navigate(`/bot/${record.id}`)
+                gaSendClickEvent('button', 'Configure Bot')
+              }}
             />
           </Popover>
           <Popconfirm
@@ -123,6 +127,7 @@ const BotList = (): React.ReactElement => {
             description="Are you sure to delete this bot?"
             onConfirm={async (): Promise<void> => {
               await onDeleteBot(record.id)
+              gaSendClickEvent('button', 'Delete Bot')
             }}
             okText="Yes"
             cancelText="No"
@@ -171,6 +176,7 @@ const BotList = (): React.ReactElement => {
                 botFormRef.current.getForm().resetFields()
               }
             }, 100)
+            gaSendClickEvent('button', 'Create New Bot')
           }}
           size='small'
         >

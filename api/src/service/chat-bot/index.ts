@@ -10,6 +10,7 @@ import { checkIntentRequiredParams } from './misc/check-intent-required-params'
 import { messageResponseFormat, messageResponseFormatJson } from './misc/message-response-format'
 import { intentDetectionFlowReturnCode } from './constants'
 import { IIntentDetectionReturn } from './type'
+import { getDomainFromUrl } from '../../misc/get-domain'
 
 export const chatBotServiceEntry = async (
   botId: string,
@@ -24,15 +25,22 @@ export const chatBotServiceEntry = async (
     throw new Error(`Bot ${botId} not found`)
   }
 
-  // Get bot's allowed origins setting
-  // If not config, allowed all traffic
-  if (botData.allowedOrigin.length > 0) {
-    const requestOrigin = (req?.headers?.origin || req?.headers?.referer) || ''
-    const isTrafficAllowed = botData.allowedOrigin.includes(requestOrigin)
+  // If traffic comes from same domain, bypass CORS check
+  const origin = (req?.headers?.origin || req?.headers?.referer) || ''
+  const apiHost = req.get?.('Host') || ''
+  let shouldDoCorsCheck = true
+  if (getDomainFromUrl(origin) === getDomainFromUrl(apiHost)) {
+    logger.info({ botId }, 'Traffic comes from same domain, bypass CORS check')
+    shouldDoCorsCheck = false
+  }
+
+  // If bot has allowedOrigin config, then do CORS check
+  if (shouldDoCorsCheck && botData.allowedOrigin.length > 0) {
+    const isTrafficAllowed = botData.allowedOrigin.includes(origin)
     if (!isTrafficAllowed) {
       logger.info({
         botId,
-        requestOrigin,
+        origin,
         allowedOrigins: botData.allowedOrigin,
       }, 'Traffic is not allowed')
       res.status(403).json({ error: 'Traffic is not allowed' })

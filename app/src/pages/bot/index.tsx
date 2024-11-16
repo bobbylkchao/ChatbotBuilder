@@ -5,7 +5,7 @@ import { Container } from './styled'
 import BotList from '../../components/bot-list'
 
 const BotPage = (): React.ReactElement => {
-  document.title = 'Bot'
+  document.title = 'Bot List'
   return (
     <AuthWrapper>
       <Container>

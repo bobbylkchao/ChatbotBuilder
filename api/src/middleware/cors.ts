@@ -1,18 +1,15 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express'
 import logger from '../misc/logger'
+import { getDomainFromUrl } from '../misc/get-domain'
 
 export const corsMiddleware = (): RequestHandler => {
-  // Helper function to remove protocol (http:// or https://) from the origin
-  const removeProtocol = (url: string) => url.replace(/^https?:\/\//, '')
-
   return (req: Request, res: Response, next: NextFunction): void => {
-    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
     const origin = (req?.headers?.origin || req?.headers?.referer) || '' // Requester's domain
-    const apiDomain = req.get('Host') // API domain
+    const apiHost = req.get('Host') // API domain
 
     logger.info({
       origin,
-      apiDomain,
+      apiHost,
       path: req.path,
     }, 'API request - Received')
 
@@ -40,14 +37,7 @@ export const corsMiddleware = (): RequestHandler => {
     }
 
     // Allow requests from the same domain (origin matches the API domain)
-    if (removeProtocol(origin) === apiDomain) {
-      res.header('Access-Control-Allow-Origin', origin)
-      next()  // Call next() to pass control to the next middleware
-      return
-    }
-
-    // Handle allowed origins
-    if (allowedOrigins.includes(origin)) {
+    if (getDomainFromUrl(origin) === getDomainFromUrl(apiHost || '')) {
       res.header('Access-Control-Allow-Origin', origin)
       next()  // Call next() to pass control to the next middleware
       return
@@ -56,7 +46,7 @@ export const corsMiddleware = (): RequestHandler => {
     // For other cases, return Forbidden response
     logger.info({
       origin,
-      apiDomain,
+      apiHost,
       path: req.path,
     }, 'API request - Denied')
     res.status(403).json({ error: 'Forbidden' })  // Return a 403 Forbidden response

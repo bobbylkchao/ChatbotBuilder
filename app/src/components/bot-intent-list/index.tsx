@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react"
-import { Table, Space, Checkbox, Button, Popconfirm } from "antd"
+import { Table, Space, Checkbox, Button, Popconfirm, Switch, Tooltip } from "antd"
 import type { TableProps, PopconfirmProps } from 'antd'
-import { PlusOutlined } from "@ant-design/icons"
+import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons"
 import toast from 'react-hot-toast'
+import { useMutation } from "@apollo/client"
 import { IBotIntents } from "../../context/type"
 import { useGlobalStateContext } from "../../context/global-state"
 import { convertToLocalTime } from "../../misc/convert-to-local-time"
@@ -10,7 +11,9 @@ import { Dot } from "../dot/styled"
 import Modal from "../modal"
 import IntentDetails, { IIntentDetailsRef } from "../intent-details"
 import { themeConfig } from "../../theme/config"
-import { ButtonContainer } from "./styled"
+import { ButtonContainer, CreateIntentButtonContainer, StrictIntentDetectionContainer } from "./styled"
+import { gaSendClickEvent } from "../../misc/google-analytics"
+import { updateBotStrictIntentDetectionQuery } from "../../misc/apollo-queries/update-bot-strict-intent-detection"
 
 interface IBotIntentListProps {
   botId: string
@@ -19,9 +22,18 @@ interface IBotIntentListProps {
 const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
   const [dataSource, setDataSource] = useState<IBotIntents[] | []>([])
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isStrictIntentDetectionModalOpen, setIsStrictIntentDetectionModalOpen] = useState<boolean>(false)
   const [currentIntentId, setCurrentIntentId] = useState<string>('')
   const intentDetailsFormRef = useRef<IIntentDetailsRef | null>(null)
-  const { user } = useGlobalStateContext()
+  const { user, setUser } = useGlobalStateContext()
+  const [
+    updateBotStrictIntentDetectionHandler,
+    {
+      data: updateBotStrictIntentDetectionHandlerResult,
+      loading: updateBotStrictIntentDetectionHandlerLoading,
+      error: updateBotStrictIntentDetectionHandlerError,
+    }
+  ] = useMutation(updateBotStrictIntentDetectionQuery)
 
   // Set intent details data when model is opened
   const openIntentDetailsModal = useCallback(() => {
@@ -55,6 +67,31 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
       })
     }
   }, [user])
+
+  useEffect(() => {
+    if (updateBotStrictIntentDetectionHandlerResult) {
+      const newBotUpdatedAt =
+        updateBotStrictIntentDetectionHandlerResult.updateBotStrictIntentDetection.updatedAt
+      const newStrictIntentDetection = 
+        updateBotStrictIntentDetectionHandlerResult.updateBotStrictIntentDetection.strictIntentDetection
+      setUser((prevUser) => {
+        if (!prevUser) return prevUser
+        return {
+          ...prevUser,
+          userBots: prevUser.userBots?.map((bot) =>
+            bot.id === botId
+              ? {
+                  ...bot,
+                  strictIntentDetection: newStrictIntentDetection,
+                  updatedAt: newBotUpdatedAt,
+                }
+              : bot
+          ),
+        }
+      })
+      toast.success('Strict intent detection updated!')
+    }
+  }, [updateBotStrictIntentDetectionHandlerResult])
 
   const columns: TableProps<IBotIntents>['columns'] = [
     {
@@ -113,34 +150,70 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
   return (
     <>
       <ButtonContainer>
-        <Button
-          type='primary'
-          htmlType='submit'
-          style={{
-            backgroundColor: themeConfig.primary,
-            fontSize: 14,
-          }}
-          onClick={() => {
-            setCurrentIntentId('')
-            openIntentDetailsModal()
-            setTimeout(() => {
-              intentDetailsFormRef?.current?.setData({
-                botId,
-                key: undefined,
-                id: undefined,
-                name: undefined,
-                isEnabled: undefined,
-                intentHandler: undefined,
-                createdAt: undefined,
-                updatedAt: undefined,
-                requiredFields: undefined,
-              })
-            }, 100)
-          }}
-          size='small'
-        >
-          <PlusOutlined /> Create New Intent
-        </Button>
+        <StrictIntentDetectionContainer>
+          <Space direction="horizontal" align="center">
+            <span>
+              Strict Intent Detection
+            </span>
+            <Tooltip placement="top" title={<p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry, I don't know”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>}>
+              <Switch
+                loading={updateBotStrictIntentDetectionHandlerLoading}
+                checkedChildren="Enabled"
+                unCheckedChildren="Disabled"
+                value={user?.userBots?.find(bot => bot.id === botId)?.strictIntentDetection}
+                onClick={(_, event) => event.stopPropagation()}
+                onChange={async (value) => {
+                  try {
+                    await updateBotStrictIntentDetectionHandler({
+                      variables: {
+                        botId,
+                        strictIntentDetection: value,
+                      },
+                    })
+                  } catch (err: any) {
+                    console.error(err)
+                    const errorMessage = err?.graphQLErrors?.[0]?.message || 
+                      err?.networkError?.message || 
+                      `Strict intent detection update failed!`
+                    toast.error(errorMessage)
+                  }
+                }}
+              />
+            </Tooltip>
+            <QuestionCircleOutlined onClick={() => setIsStrictIntentDetectionModalOpen(true)} title="Tips" />
+          </Space>
+        </StrictIntentDetectionContainer>
+        <CreateIntentButtonContainer>
+          <Button
+            type='primary'
+            htmlType='submit'
+            style={{
+              backgroundColor: themeConfig.primary,
+              fontSize: 14,
+            }}
+            onClick={() => {
+              setCurrentIntentId('')
+              openIntentDetailsModal()
+              setTimeout(() => {
+                intentDetailsFormRef?.current?.setData({
+                  botId,
+                  key: undefined,
+                  id: undefined,
+                  name: undefined,
+                  isEnabled: undefined,
+                  intentHandler: undefined,
+                  createdAt: undefined,
+                  updatedAt: undefined,
+                  requiredFields: undefined,
+                })
+              }, 100)
+              gaSendClickEvent('button', 'Create New Intent')
+            }}
+            size='small'
+          >
+            <PlusOutlined /> Create New Intent
+          </Button>
+        </CreateIntentButtonContainer>
       </ButtonContainer>
       <Table
         dataSource={dataSource}
@@ -165,7 +238,7 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
             description="Are you sure to delete this intent?"
             onConfirm={async (): Promise<void> => {
               if (intentDetailsFormRef?.current) {
-                console.log('delete')
+                gaSendClickEvent('button', 'Delete the intent')
                 const result = await intentDetailsFormRef.current.onDelete()
                 if (result) {
                   setIsModalOpen(false)
@@ -181,6 +254,16 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
         }
       >
         <IntentDetails ref={intentDetailsFormRef} />
+      </Modal>
+
+      <Modal
+        title='Strict Intent Detection'
+        isModalOpen={isStrictIntentDetectionModalOpen}
+        handleCancel={() => setIsStrictIntentDetectionModalOpen(false)}
+        handleOk={() => setIsStrictIntentDetectionModalOpen(false)}
+        disableCancelButton={true}
+      >
+        <p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry, I don't know”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>
       </Modal>
     </>
   )

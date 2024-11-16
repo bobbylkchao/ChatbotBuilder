@@ -40,22 +40,38 @@ export const intentHandlerFlow = async ({
     logger.info({ intentHandlerId }, 'FUNCTIONAL response')
     // TODO: give a list about all context functions that can be used within sandbox
     // Pass context to inside of sandbox, the code is running in sandbox can use these context
+    const sendMessageFunction = (message: string) => res.write(messageResponseFormat(message))
+
     const contextInSandbox = {
       ...(intentParameters || {}),
       request: req,
       response: res,
+      sendMessage: sendMessageFunction,
       fetch: fetch,
     }
     const decodedFunction = functionalHandler(intentHandlerContent || '', contextInSandbox)
 
     let sandboxResult = ''
+    let errorDetails = ''
     try {
       sandboxResult = await decodedFunction()
-    } catch (err) {
+    } catch (err: any) {
+      // Explicitly return sandbox errors to the frontend, assuming developers cannot query the api logs
       logger.error({ intentHandlerId, err }, 'Code execution in the sandbox encountered an error')
       sandboxResult = 'Something went wrong, please try again.'
+
+      if (err?.message) {
+        errorDetails = `Error: ${err.message}`
+      }
     }
-    res.write(messageResponseFormat(sandboxResult))
+
+    if (sandboxResult) {
+      res.write(messageResponseFormat(sandboxResult))
+    }
+
+    if (errorDetails) {
+      res.write(messageResponseFormat(errorDetails))
+    }
   }
 
   if (intentHandlerType === 'MODELRESPONSE') {

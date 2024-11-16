@@ -8,7 +8,7 @@ import { themeConfig } from '../../theme/config'
 
 const PlaygroundPage = (): React.ReactElement => {
   const [selectedBot, setSelectedBot] = useState<string>('')
-  document.title = 'Playground'
+  document.title = 'Bot Playground'
 
   return (
     <AuthWrapper>

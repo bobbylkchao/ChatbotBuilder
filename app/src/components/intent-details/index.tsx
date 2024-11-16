@@ -2,15 +2,15 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } f
 import { useParams } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 import type { FormProps } from 'antd'
-import { Checkbox, Form, Input, Radio, Select, Divider } from 'antd'
-import { QuestionCircleOutlined, LoadingOutlined } from '@ant-design/icons'
+import { Checkbox, Form, Input, Radio, Select, Divider, Button } from 'antd'
+import { QuestionCircleOutlined, LoadingOutlined, BulbOutlined } from '@ant-design/icons'
 import toast from 'react-hot-toast'
 import MDEditor from '@uiw/react-md-editor'
 import rehypeSanitize from 'rehype-sanitize'
 import { IBotIntents, TBotIntentHandlerType } from '../../context/type'
 import { useGlobalStateContext } from '../../context/global-state'
 import { themeConfig } from '../../theme/config'
-import { Container, LeftContainer, RightContainer, MarkdownEditorContainer } from './styled'
+import { Container, LeftContainer, RightContainer, MarkdownEditorContainer, EditorTipsContainer } from './styled'
 import CodeEditor, { ICodeEditorRef } from '../code-editor'
 import { updateIntentHandler } from '../../misc/apollo-queries/update-intent-handler'
 import { createIntentQuery } from '../../misc/apollo-queries/create-intent'
@@ -44,6 +44,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
   const [isIntentNameModalOpen, setIsIntentNameModalOpen] = useState<boolean>(false)
   const [isRequiredFieldsModalOpen, setIsRequiredFieldsModalOpen] = useState<boolean>(false)
   const [isIntentHandlerTypeModalOpen, setIsIntentHandlerTypeModalOpen] = useState<boolean>(false)
+  const [isEditorTipsModalOpen, setIsEditorTipsModalOpen] = useState<boolean>(false)
   const [currentIntent, setCurrentIntent] = useState<IBotIntents | undefined>(undefined)
   const codeEditorRef = useRef<ICodeEditorRef | null>(null)
   const [codeLoaded, setCodeLoaded] = useState<boolean>(false)
@@ -88,14 +89,17 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
       form.resetFields()
       form.setFieldsValue(intent)
       if (!intent.id) {
+        // create
         setTypeOfAction('create')
         form.setFieldsValue({
           'intentHandlerType': undefined,
           'intentHandlerContent': '',
           'intentHandlerGuidelines': '',
+          'isEnabled': true,
         })
         setHandlerContentMarkdown('')
       } else {
+        // update
         setTypeOfAction('update')
         form.setFieldsValue({
           'intentHandlerType': intent.intentHandler?.type,
@@ -284,6 +288,11 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         if (!prevUser) return prevUser
 
         const newIntentData = submitCreateIntentHandlerResult
+
+        let intentHandlerGuidelinesDynamic = formIntentHandlerGuidelines
+        if (formIntentHandlerType !== 'MODELRESPONSE') {
+          intentHandlerGuidelinesDynamic = ''
+        }
   
         const newIntent: IBotIntents = {
           botId: currentIntent?.botId || '',
@@ -295,6 +304,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
             id: newIntentData.createIntent.intentHandler.id,
             type: formIntentHandlerType,
             content: formIntentHandlerContent,
+            guidelines: intentHandlerGuidelinesDynamic,
             createdAt: newIntentData.createIntent.intentHandler.createdAt,
             updatedAt: newIntentData.createIntent.intentHandler.updatedAt,
           },
@@ -462,6 +472,12 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
       {
         formIntentHandlerType === 'FUNCTIONAL' && (
           <RightContainer>
+            <EditorTipsContainer>
+              <Button
+                type='link'
+                onClick={() => setIsEditorTipsModalOpen(true)}
+              ><BulbOutlined />Tips: Check out what functions are available for use in the editor.</Button>
+            </EditorTipsContainer>
             <CodeEditor
               ref={codeEditorRef}
             />
@@ -515,6 +531,69 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         <p><b>Functional</b>, used to perform additional logic before returning an answer to the user, such as when the user asks: "What's the weather in Winnipeg today?". You need logic to request the weather API to complete the query. In this type, you can write your own code to handle it. In your code you also can directly access the required parameters you configured. The execution of the code will be safe, it will be executed in a separate VM sandbox.</p>
         <p><b>Model Response</b>, It will be combined with the intent handler guidelines and handed over to the model for further processing and generation.</p>
         <p><b>Component</b>, used to return a component and display it to the user. For example, when a user asks "I need help with my account", you can return a "Sign In Form" component to the user, and the user uses the component to complete the login.</p>
+      </Modal>
+
+      <Modal
+        title='Code Editor'
+        isModalOpen={isEditorTipsModalOpen}
+        handleCancel={() => setIsEditorTipsModalOpen(false)}
+        handleOk={() => setIsEditorTipsModalOpen(false)}
+        disableCancelButton={true}
+        size='lg'
+      >
+        <p><b>Introduction:</b></p>
+        <p>This is a browser-based code editor. When you save your code, it is converted to Base64 and stored in the database. When a user asks a question and an intent is detected, the system executes the code you wrote. The code runs in a secure sandbox environment with limited permissions and access to predefined functions.</p>
+        <Divider />
+
+        <p><b>How to return?</b></p>
+        <p>If you want to return, you can use <i><b>return</b></i> directly, for example <code>return 'Bye! Have a nice day!';</code>. If you want to return in stream mode, for example, return multiple messages and users will continue to receive messages on the frontend, please use <code>sendMessage(message: string)</code>, as described below.</p>
+        <Divider />
+
+        <p><b>How to access required fields variables?</b></p>
+        <p>You can directly access the required fields that you define for your intent. For example, if you define <code>offerNumber</code> and <code>email</code> as required fields, you can use them in your code as shown below:</p>
+        <pre>
+          const offerNumberFromUserInput = offerNumber;<br/>
+          const emailFromUserInput = email;
+        </pre>
+        <Divider />
+
+        <p><b>Available Functions:</b></p>
+        <p>The following functions are currently available in the sandbox:</p>
+        <p>1. <b>request</b></p>
+        <p>Represents an Express.js Request object. You can use it to access request data, such as query parameters or body content. <a href='https://expressjs.com/en/api.html#req' target='_blank'>API Reference Documentation</a>.</p>
+        <p>Example:</p>
+        <pre>
+          const userQuery = request.query.queryString;<br/>
+          const host = request.get('Host');<br/>
+          const origin = (request?.headers?.origin || request?.headers?.referer) || '';<br/>
+          const cookies = request.cookies;
+        </pre>
+        <Divider/>
+        <p>2. <b>response</b></p>
+        <p>Represents an Express.js Response object. <a href='https://expressjs.com/en/api.html#res' target='_blank'>API Reference Documentation</a>.</p>
+        <p>Example:</p>
+        <pre>
+          response.locals.userName = 'bobby';
+        </pre>
+        <Divider/>
+        <p>3. <b>sendMessage</b></p>
+        <p>This function is used to send stream messages to users. Use <code>sendMessage(message: string)</code> to send messages. Users will continue to receive messages on the frontend.</p>
+        <p>Example:</p>
+        <pre>
+          sendMessage('Please stay with me, I need some time to process your order...');<br/>
+          // Other logic<br/>
+          // ...<br/>
+          sendMessage('Ok, your order has been processed!');
+        </pre>
+        <Divider/>
+        <p>4. <b>fetch</b></p>
+        <p>A standard JavaScript Fetch API for making HTTP requests. <a href='https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch' target='_blank'>Documentation</a>.</p>
+        <p>Example:</p>
+        <pre>
+        const response = await fetch('https://api.ipify.org?format=json');<br/>
+        const result = await response.json();<br/>
+        return 'Your IP is: ' + result.ip;
+        </pre>
       </Modal>
     </Container>
   )
