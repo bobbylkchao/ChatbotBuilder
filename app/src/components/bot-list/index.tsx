@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Table, Space, Button, Popconfirm, Popover } from "antd"
+import { Table, Space, Button, Popconfirm, Tour, Tooltip } from "antd"
 import { PlusOutlined, SettingOutlined, CloseOutlined, LoadingOutlined, ExportOutlined } from "@ant-design/icons"
-import type { TableProps } from 'antd'
+import type { TableProps, TourProps } from 'antd'
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@apollo/client"
 import { useGlobalStateContext } from "../../context/global-state"
@@ -29,9 +29,13 @@ interface IDataType {
 const BotList = (): React.ReactElement => {
   const [dataSource, setDataSource] = useState<IDataType[] | []>([])
   const [isCreateBotModalOpen, setIsCreateBotModalOpen] = useState<boolean>(false)
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(false)
   const { user, setUser } = useGlobalStateContext()
   const navigate = useNavigate()
   const botFormRef = useRef<IBotFormRef | null>(null)
+  const tourRefBotName = useRef(null)
+  const tourRefCreateBot = useRef(null)
+  const tourRefPublicUrl = useRef(null)
   const [
     submitDeleteBotHandler,
     {
@@ -55,6 +59,15 @@ const BotList = (): React.ReactElement => {
         })
       })
       setDataSource(botList)
+
+      if (!localStorage.getItem('isBotListTourCompleted')) {
+        setIsTourOpen(true)
+        localStorage.setItem('isBotListTourCompleted', '1')
+      }
+    }
+
+    if (user?.userBots && user.userBots.length === 0) {
+      setDataSource([])
     }
   }, [user])
   
@@ -72,12 +85,35 @@ const BotList = (): React.ReactElement => {
       toast.error(errorMessage)
     }
   }
+
+  const tourSteps: TourProps['steps'] = [
+    {
+      title: 'Example Chatbot',
+      description: 'This is an example chatbot with everything included, you can use this as a reference.',
+      target: () => tourRefBotName.current,
+    },
+    {
+      title: 'Public URL',
+      description: 'Click and open your chatbot in new tab and copy public url. Then you can make your chatbot available to your users in other places, such as embedding it in your web or app.',
+      target: () => tourRefPublicUrl.current,
+    },
+    {
+      title: 'Create Chatbot',
+      description: 'Create your own new chatbots.',
+      target: () => tourRefCreateBot.current,
+    },
+  ]
   
   const columns: TableProps<IDataType>['columns'] = [
     {
       title: 'Bot Name',
       dataIndex: 'botName',
       key: 'botName',
+      render: (_, record) => (
+        <span
+          ref={tourRefBotName}
+        >{ record.botName }</span>
+      ),
     },
     {
       title: 'Created By',
@@ -101,12 +137,16 @@ const BotList = (): React.ReactElement => {
       dataIndex: 'publicUrl',
       key: 'publicUrl',
       render: (_, record) => (
-        <Popover content="Open chatbot in new tab and copy public url">
+        <Tooltip
+          placement="top"
+          title={<p>Open chatbot in new tab and copy public url</p>}
+        >
           <a
             href={`/chat/${record.id}`}
             target='_blank'
+            ref={tourRefPublicUrl}
           ><ExportOutlined /></a>
-        </Popover>
+        </Tooltip>
       ),
     },
     {
@@ -114,14 +154,17 @@ const BotList = (): React.ReactElement => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Popover content="Configure Bot">
+          <Tooltip
+            placement="top"
+            title={<p>Configure chatbot</p>}
+          >
             <SettingOutlined
-              onClick={() => {
-                navigate(`/bot/${record.id}`)
-                gaSendClickEvent('button', 'Configure Bot')
-              }}
-            />
-          </Popover>
+                onClick={() => {
+                  navigate(`/bot/${record.id}`)
+                  gaSendClickEvent('button', 'Configure Bot')
+                }}
+              />
+          </Tooltip>
           <Popconfirm
             title="Delete bot"
             description="Are you sure to delete this bot?"
@@ -163,6 +206,7 @@ const BotList = (): React.ReactElement => {
       <Divider />
       <ButtonContainer>
         <Button
+          ref={tourRefCreateBot}
           type='primary'
           htmlType='submit'
           style={{
@@ -206,6 +250,8 @@ const BotList = (): React.ReactElement => {
           }}
         />
       </Modal>
+
+      <Tour open={isTourOpen} onClose={() => setIsTourOpen(false)} steps={tourSteps} />
     </Container>
   )
 }

@@ -22,7 +22,9 @@ export const chatBotServiceEntry = async (
   const botData = await getBotGuildlinesAndIntent(botId)
 
   if (!botData) {
-    throw new Error(`Bot ${botId} not found`)
+    res.write(messageResponseFormat("<span style='color: red;font-weight: bold;'>Bot not found!</span>"))
+    res.end()
+    return
   }
 
   // If traffic comes from same domain, bypass CORS check

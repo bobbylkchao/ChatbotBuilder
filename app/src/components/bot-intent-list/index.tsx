@@ -155,7 +155,7 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
             <span>
               Strict Intent Detection
             </span>
-            <Tooltip placement="top" title={<p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry, I don't know”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>}>
+            <Tooltip placement="top" title={<p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry I can't answer this question”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>}>
               <Switch
                 loading={updateBotStrictIntentDetectionHandlerLoading}
                 checkedChildren="Enabled"
@@ -263,7 +263,7 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
         handleOk={() => setIsStrictIntentDetectionModalOpen(false)}
         disableCancelButton={true}
       >
-        <p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry, I don't know”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>
+        <p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry I can't answer this question”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>
       </Modal>
     </>
   )

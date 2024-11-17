@@ -9,19 +9,20 @@ export const StyledAuthWrapper = styled(Wrapper)`
 export const StyledLeftContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 220px;
-  height: 100vh;
+  height: 100%;
   background-color: ${themeConfig.backgroundColor.lighter};
+  width: 200px;
 `
 
 export const StyledRightContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: calc(100vw - 220px);
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   padding: 0 15px;
   background-color: #ffffff;
   color: ${themeConfig.textColor.lighter};
+  overflow: auto;
 `
 
 export const VersionContainer = styled.span`

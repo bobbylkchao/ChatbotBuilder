@@ -11,7 +11,7 @@ export const fetchChatApi = async (botId: string, requestPayload: string): Promi
     return response
   } catch (err: any) {
     if (err.message === 'Failed to fetch') {
-      console.error('CORS error detected, please check bot allowed origins setting')
+      console.error('API error or CORS error detected, please API status or check bot allowed origins setting')
     } else {
       console.error('Network error:', err)
     }

@@ -106,7 +106,7 @@ export const updateBot = async ({
 
 interface ICreateBotArgs {
   userId: string
-  botName: string
+  name: string
   greetingMessage: string
   guidelines: string
   allowedOrigin?: string[]
@@ -114,7 +114,7 @@ interface ICreateBotArgs {
 
 export const createBot = async ({
   userId,
-  botName,
+  name,
   greetingMessage,
   guidelines,
   allowedOrigin = [],
@@ -123,8 +123,8 @@ export const createBot = async ({
     const botData = await prisma.bot.findUnique({
       where: {
         user_bot: {
-          userId: userId,
-          name: botName,
+          userId,
+          name,
         },
       },
     })
@@ -135,8 +135,8 @@ export const createBot = async ({
 
     const createBotQuery = prisma.bot.create({
       data: {
-        userId: userId,
-        name: botName,
+        userId,
+        name,
         greetingMessage,
         guidelines,
         allowedOrigin,
@@ -172,6 +172,11 @@ export const deleteBot = async ({
     }
 
     await prisma.$transaction([
+      prisma.quickAction.deleteMany({
+        where: {
+          botId,
+        },
+      }),
       prisma.intentHandler.deleteMany({
         where: {
           intentHandler: {

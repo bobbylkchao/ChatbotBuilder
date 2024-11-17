@@ -6,10 +6,9 @@ export const Wrapper = styled.div`
   color: ${themeConfig.textColor.primary};
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
-  width: 100vw;
   height: 100vh;
+  width: 100%;
   font-size: ${themeConfig.textSize.default};
   font-family: ${themeConfig.fontFamily};
 

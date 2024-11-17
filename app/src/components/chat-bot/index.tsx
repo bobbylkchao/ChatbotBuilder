@@ -102,24 +102,27 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
               match => match[1].trim()
             )
 
+            const newMessage: IMessage[] = messagesFilterInArray.map(eachNewMessage => ({
+              role: 'assistant',
+              content: eachNewMessage,
+              timestamp: new Date(),
+            }))
+
             setMessages(prevMessages => {
               const updatedMessages = [...prevMessages]
-              messagesFilterInArray.forEach((messageInArray, index) => {
-                const loadingMessage = updatedMessages.find(
-                  message => message.content === 'loading' && message.role === 'assistant'
-                )
-                if (loadingMessage) {
-                  loadingMessage.content = messageInArray
-                  loadingMessage.timestamp = new Date()
-                } else {
-                  updatedMessages.push({
-                    role: 'assistant',
-                    content: messageInArray,
-                    timestamp: new Date(),
-                  })
+              const lastCurrentMessage = updatedMessages[updatedMessages.length - 1]
+
+              if (lastCurrentMessage?.content === 'loading' && lastCurrentMessage?.role === 'assistant') {
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...lastCurrentMessage,
+                  content: newMessage[0].content,
+                  timestamp: newMessage[0].timestamp,
                 }
-                messagesFilterInArray.splice(index, 1)
-              })
+                updatedMessages.push(...newMessage.slice(1))
+              } else {
+                updatedMessages.push(...newMessage)
+              }
+
               return updatedMessages
             })
 
@@ -131,9 +134,6 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
           }
   
           let chunkString = decoder.decode(value)
-          // TODO:
-          //console.log('chunkString', chunkString)
-          //chunkString = chunkString.replace(/ +/g, ' ').replace(/\s*'\s*/g, "'").replace(/`/g, '')
           assistantContent += chunkString
           readChunk()
         }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '../../components/button/styled'
 import { useNavigate } from 'react-router-dom'
 import { useGlobalStateContext } from '../../context/global-state'
@@ -9,7 +9,14 @@ import { themeConfig } from '../../theme/config'
 
 const DashboardPage = (): React.ReactElement => {
   const navigate = useNavigate()
+  const [isTourCompleted, setIsTourCompleted] = useState<boolean>(false)
   document.title = 'Dashboard'
+
+  useEffect(() => {
+    if (localStorage.getItem('isBotListTourCompleted')) {
+      setIsTourCompleted(true)
+    }
+  }, [])
   
   return (
     <AuthWrapper>
@@ -19,13 +26,28 @@ const DashboardPage = (): React.ReactElement => {
             color: themeConfig.textColor.lighter,
             fontWeight: 'bold',
           }}
-        >Welcome</HeaderH1>
-        <p>You can start by creating a chatbot.</p>
-        <p>
-          <Button
-            onClick={() => navigate('/bot')}
-          >Create Your Chatbot</Button>
-        </p>
+        >👋 Welcome</HeaderH1>
+        {
+          !isTourCompleted ? (
+            <>
+              <p>I have prepared an example chatbot for you</p>
+              <p>
+                <Button
+                  onClick={() => navigate('/bot')}
+                >Go and take a look</Button>
+              </p>
+            </>
+          ) : (
+            <>
+              <p>You can start by creating a chatbot.</p>
+              <p>
+                <Button
+                  onClick={() => navigate('/bot')}
+                >Create Your Chatbot</Button>
+              </p>
+            </>
+          )
+        }
       </Container>
     </AuthWrapper>
   )

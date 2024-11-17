@@ -197,7 +197,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           name='name'
           rules={[{
             required: true,
-            pattern: /^[\p{L}\p{N}\s]+$/u,
+            pattern: /^[\p{L}\p{N}\s\-\(\)]+$/u,
             message: 'Bot name format is incorrect!',
           }]}
         >

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { Collapse, Button, Space, Switch } from 'antd'
+import { Collapse, Button, Space, Switch, Tour } from 'antd'
 import { PlusOutlined, CheckOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import type { TourProps } from 'antd'
 import { IUserBots } from '../../context/type'
 import { useGlobalStateContext } from '../../context/global-state'
 import BotNotFound from './bot-not-found'
@@ -20,11 +21,44 @@ const BotDetails = (): React.ReactElement => {
   const [currentBot, setCurrentBot] = useState<IUserBots | null | 'loading'>('loading')
   const [isBotIntentTipsModalOpen, setIsBotIntentTipsModalOpen] = useState<boolean>(false)
   const [isBotQuickActionsTipsModalOpen, setIsBotQuickActionsTipsModalOpen] = useState<boolean>(false)
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(false)
+  const tourRefBotInfo = useRef(null)
+  const tourRefTips = useRef(null)
+  const tourRefIntentInfo = useRef(null)
+  const tourRefQuickActions = useRef(null)
 
   useEffect(() => {
     const bot = user?.userBots?.find(bot => bot.id === botId) || null
     setCurrentBot(bot)
+
+    if (!localStorage.getItem('isBotDetailsTourCompleted')) {
+      setIsTourOpen(true)
+      localStorage.setItem('isBotDetailsTourCompleted', '1')
+    }
   }, [botId, user?.userBots])
+
+  const tourSteps: TourProps['steps'] = [
+    {
+      title: 'Bot Info',
+      description: 'Here you can configure the main configuration of your chatbot.',
+      target: () => tourRefBotInfo.current,
+    },
+    {
+      title: 'Bot Intents',
+      description: 'Here you can configure the intents of your chatbot, and configure the corresponding handler for each intent to handle it.',
+      target: () => tourRefIntentInfo.current,
+    },
+    {
+      title: 'Tips',
+      description: 'There are many tips on the platform. If you don\'t understand something, you can click on the question mark icons and there will be detailed instructions to guide you.',
+      target: () => tourRefTips.current
+    },
+    {
+      title: 'Bot Quick Actions',
+      description: 'Here you can configure your chatbot Quick Actions. To help users, especially first-time users who might not know what to ask, by offering them ideas on how to interact with the chatbot.',
+      target: () => tourRefQuickActions.current,
+    },
+  ]
 
   if (currentBot === 'loading') {
     return <div>Loading...</div>
@@ -44,7 +78,7 @@ const BotDetails = (): React.ReactElement => {
       <Collapse
         items={[{
           key: 'botInfo',
-          label: <b>Bot Info</b>,
+          label: <b ref={tourRefBotInfo}>Bot Info</b>,
           children: <BotForm botData={currentBot}/>,
         }]}
         defaultActiveKey={['botInfo']}
@@ -60,11 +94,15 @@ const BotDetails = (): React.ReactElement => {
             <BotIntentHeaderContainer>
               <BotIntentHeaderLeft>
                 <span>
-                  <b>Bot Intents </b>
-                  <QuestionCircleOutlined onClick={(event) => {
-                    event.stopPropagation()
-                    setIsBotIntentTipsModalOpen(true)
-                  }} title="Tips"/>
+                  <b ref={tourRefIntentInfo}>Bot Intents </b>
+                  <QuestionCircleOutlined
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      setIsBotIntentTipsModalOpen(true)
+                    }}
+                    title="Tips"
+                    ref={tourRefTips}
+                  />
                 </span>
               </BotIntentHeaderLeft>
             </BotIntentHeaderContainer>
@@ -81,7 +119,7 @@ const BotDetails = (): React.ReactElement => {
         items={[{
           key: 'botQuickActionConfigurations',
           label: (
-            <span>
+            <span ref={tourRefQuickActions}>
               <b>Bot Quick Actions </b>
               <QuestionCircleOutlined onClick={(event) => {
                 event.stopPropagation()
@@ -97,6 +135,7 @@ const BotDetails = (): React.ReactElement => {
           marginTop: '10px',
         }}
       />
+
       <Modal
         title='Bot Intent'
         isModalOpen={isBotIntentTipsModalOpen}
@@ -135,6 +174,8 @@ const BotDetails = (): React.ReactElement => {
         
         <p>When a user clicks the "Find a hotel" button, the chatbot automatically sends the message "Find a hotel." You can then handle this request by defining an intent for it (e.g., <i>"user_ask_find_a_hotel"</i>) and implementing the corresponding handler, which might involve calling a hotel search API and returning a list of hotels to the user.</p>
       </Modal>
+
+      <Tour open={isTourOpen} onClose={() => setIsTourOpen(false)} steps={tourSteps} />
     </>
   )
 }

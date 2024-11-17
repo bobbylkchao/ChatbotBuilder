@@ -40,7 +40,10 @@ export const intentHandlerFlow = async ({
     logger.info({ intentHandlerId }, 'FUNCTIONAL response')
     // TODO: give a list about all context functions that can be used within sandbox
     // Pass context to inside of sandbox, the code is running in sandbox can use these context
-    const sendMessageFunction = (message: string) => res.write(messageResponseFormat(message))
+    const sendMessageFunction = (message: string) => {
+      console.log('sendMessageFunction', message)
+      res.write(messageResponseFormat(message))
+    }
 
     const contextInSandbox = {
       ...(intentParameters || {}),

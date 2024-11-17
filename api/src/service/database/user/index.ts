@@ -2,6 +2,8 @@ import { Prisma, User } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
+import { botSeed, quickActionConfig, intentSeed } from '../seeds/config'
+
 export const getUser = async (openId: string, email: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -39,6 +41,22 @@ export const createUser = async (args: Prisma.UserUncheckedCreateInput) => {
         updatedAt: new Date(),
         ...(args.role && { role: args.role }),
         ...(args.name && { name: args.name }),
+        userBots: {
+          create: {
+            name: botSeed.name,
+            guidelines: botSeed.guidelines,
+            greetingMessage: botSeed.greetingMessage,
+            strictIntentDetection: botSeed.strictIntentDetection,
+            botQuickActions: {
+              create: {
+                config: quickActionConfig,
+              },
+            },
+            botIntents: {
+              create: intentSeed,
+            },
+          },
+        },
       },
       include: {
         userBots: {
@@ -53,6 +71,7 @@ export const createUser = async (args: Prisma.UserUncheckedCreateInput) => {
         },
       },
     })
+    logger.info({ email: createUserQuery.email }, 'User created with bot seeds')
     return createUserQuery
   } catch (err) {
     throw err

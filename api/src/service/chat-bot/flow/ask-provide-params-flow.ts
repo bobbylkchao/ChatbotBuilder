@@ -22,7 +22,8 @@ export const askProvideParamsFlow = async (
         ===============
         Global Guidelines:
           - In order to process the user's question(intention), the user needs to provide parameters: ${missingFields}, you need to generate a prompt to tell the user according to the parameters provided.
-          - Return type should be string
+          - Your purpose is just to let the user provide the missing parameters, don't say anything irrelevant.
+          - Return type should be string.
         ===============
         `
       }],

@@ -86,7 +86,7 @@ const GoogleSignIn = (): React.ReactElement => {
     )
   }
 
-  if (called && loading) {
+  if ((called && loading) || data) {
     return <Button
       style={{marginTop: '20px'}}
     >Logging in...</Button>

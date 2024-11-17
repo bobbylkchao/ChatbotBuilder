@@ -22,21 +22,21 @@ const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) 
   })
   md.linkify.set({ fuzzyEmail: false })
 
-  const updateMessageContent = useCallback(async () => {
-    if (message.role === 'assistant' && message.content !== 'loading') {
-      const htmlContent = md.render(md.render(message.content))
+  const updateMessageContent = useCallback(async (newMessage: IMessage) => {
+    if (newMessage.role === 'assistant' && newMessage.content !== 'loading') {
+      const htmlContent = md.render(md.render(newMessage.content))
+      console.log(htmlContent)
       setContent(addTargetAttrToHyperLink(htmlContent ))
-
-      if (message?.componentItem && message.componentItem.length > 0) {
-        setComponents(message.componentItem)
+      if (newMessage?.componentItem && newMessage.componentItem.length > 0) {
+        setComponents(newMessage.componentItem)
       }
     } else {
-      setContent(addTargetAttrToHyperLink(message.content))
+      setContent(addTargetAttrToHyperLink(newMessage.content))
     }
   }, [])
 
   useEffect(() => {
-    updateMessageContent()
+    updateMessageContent(message)
   }, [message])
 
   const DisplayComponent = useCallback((): React.ReactElement => {
