@@ -7,7 +7,7 @@ export const handleCreateBot = async (_, args, context) => {
 
   return createBot({
     userId: user.id,
-    botName: args.botName,
+    name: args.botName,
     greetingMessage: args.greetingMessage,
     guidelines: args.guidelines,
     allowedOrigin: args.allowedOrigin,
