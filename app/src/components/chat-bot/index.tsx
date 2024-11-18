@@ -80,6 +80,7 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
         const requestPayload = JSON.stringify({
           messages: [...messages, userNewMessage],
         })
+
         const response = await fetchChatApi(botId, requestPayload)
         
         if (!response || !response?.ok) {

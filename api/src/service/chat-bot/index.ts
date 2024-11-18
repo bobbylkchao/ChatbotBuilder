@@ -11,6 +11,8 @@ import { messageResponseFormat, messageResponseFormatJson } from './misc/message
 import { intentDetectionFlowReturnCode } from './constants'
 import { IIntentDetectionReturn } from './type'
 import { getDomainFromUrl } from '../../misc/get-domain'
+import { sendLogsToCloudwatch } from '../aws/cloud-watch'
+import { getRequesterData } from '../../misc/get-requester-data'
 
 export const chatBotServiceEntry = async (
   botId: string,
@@ -73,6 +75,15 @@ export const chatBotServiceEntry = async (
     history: messages,
     botId,
   }, 'Received new chat request')
+
+  sendLogsToCloudwatch({
+    logMessage: 'Received new chat request',
+    botData: {
+      botId,
+      botName: botData.name,
+    },
+    requesterData: getRequesterData(req),
+  })
 
   const chatHistory = messages.map(m => `${m.role}: ${m.content}`).join('\n')
 

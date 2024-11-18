@@ -51,11 +51,19 @@ const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickAction
       title: 'Display Name',
       dataIndex: 'displayName',
       key: 'displayName',
+      width: '30%',
+      render: (_, record) => {
+        return <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>{ record.displayName }</div>
+      },
     },
     {
       title: 'Prompt',
       dataIndex: 'prompt',
       key: 'prompt',
+      width: '60%',
+      render: (_, record) => {
+        return <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>{ record.prompt }</div>
+      },
     },
     {
       title: 'Action',
@@ -270,7 +278,9 @@ const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickAction
             name='displayName'
             rules={[{ required: true, message: 'Please input display name!' }]}
           >
-            <Input />
+            <Input
+              placeholder='eg. 🏨 Find a hotel'
+            />
           </Form.Item>
 
           <Form.Item
@@ -285,7 +295,9 @@ const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickAction
             name='prompt'
             rules={[{ required: true, message: 'Please input prompt!' }]}
           >
-            <Input.TextArea />
+            <Input.TextArea
+              placeholder='eg. I need find a hotel'
+            />
           </Form.Item>
         </Form>
       </Modal>

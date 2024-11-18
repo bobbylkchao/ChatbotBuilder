@@ -31,27 +31,24 @@ export const intentDetectionFlow = async (
     }
 
     const intentListFormatted = botIntents && botIntents?.length > 0 ? botIntents.map(
-      intent => `'intent name: ${intent.name}, intent required fields: ${intent.requiredFields || '\'\''}'`
-    ).join('\n') : 'INTENT NOT CONFIGURED'
+      intent => `'Intent name: ${intent.name}, this intent required fields: ${intent.requiredFields || '\'\''}'.`
+    ).join('\n') : 'INTENT NOT CONFIGURED.'
 
     const guidelines = `
     ===============
     Context:
       Current user's question: "${userInput}".
       Chat history: \n${chatHistory}.
-      ===============
-      Intent list configuration start:
-      ${intentListFormatted}
-      Intent list configuration End
-      ===============
+      Intent configurations:
+        ${intentListFormatted}
     ===============
     Global Guidelines:
       ${botGlobalGuidelines}
     ===============
     Guidelines:
-      - Note: 'Intent list configuration' in 'Context' is my predefined intent configuration, 'intentName' is the name of the intent, 'intentRequiredFieds' is the required fields to be extracted from the user's question. Some intents have an empty value for 'intentRequiredFieds'.
-      - Analyze current user's question to determine which intent from the intent list configuration it matches most closely. Also analyze whether it contains multiple intents.
-      - Return the result as an Array data type, and this array includes JSON objects. The out format must be:
+      - Note: 'Intent configurations' in 'Context' is my predefined intent configuration, 'Intent name' is the name of the intent, 'intent required fields' is the required fields to be extracted from the user's question. Note, some intents do not have intent required fields'.
+      - Analyze current user's question from 'Current user's question' in 'Context' to determine which intent from the intent configurations it matches most closely. User questions may contain multiple intents, so you need analyze whether it contains multiple intents.
+      - Return the result as an Array data type, and this array includes JSON objects. The output format must be:
         {
           result: [
             {

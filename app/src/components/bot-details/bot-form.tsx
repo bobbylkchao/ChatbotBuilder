@@ -201,7 +201,9 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
             message: 'Bot name format is incorrect!',
           }]}
         >
-          <Input />
+          <Input
+            placeholder='eg. Farm Chatbot'
+          />
         </Form.Item>
 
         <Form.Item
@@ -211,7 +213,9 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           name='greetingMessage'
           rules={[{ required: true, message: 'Please input greeting message!' }]}
         >
-          <Input.TextArea />
+          <Input.TextArea
+            placeholder='eg. Hi, I am your AI Assistant.'
+          />
         </Form.Item>
 
         <Form.Item

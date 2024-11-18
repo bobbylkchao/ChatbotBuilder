@@ -98,6 +98,10 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
       title: 'Intent Name',
       dataIndex: 'name',
       key: 'name',
+      width: '20%',
+      render: (_, record) => {
+        return <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>{ record.name }</div>
+      },
     },
     {
       title: 'Intent Handler Type',
@@ -111,6 +115,10 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
       title: 'Required Fields',
       dataIndex: 'requiredFields',
       key: 'requiredFields',
+      width: '20%',
+      render: (_, record) => {
+        return <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>{ record.requiredFields }</div>
+      },
     },
     {
       title: 'Created At',

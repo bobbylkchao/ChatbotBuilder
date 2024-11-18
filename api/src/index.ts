@@ -1,6 +1,7 @@
 import http from 'http'
 import express from 'express'
 import { config } from 'dotenv'
+import cookieParser from 'cookie-parser'
 import { exec } from 'child_process'
 import logger from './misc/logger'
 import { chatMiddleware, requestValidator } from './middleware/chat'
@@ -34,6 +35,7 @@ const startServices = async () => {
   const PORT = process.env.PORT || 4000
   const expressClient = express()
   expressClient.use(corsMiddleware())
+  expressClient.use(cookieParser())
   expressClient.use(express.json())
   expressClient.post('/api/chat/:botId', ...requestValidator, chatMiddleware)
 

@@ -381,7 +381,9 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
               message: 'Intent name format is incorrect'
             }]}
           >
-            <Input />
+            <Input
+              placeholder='eg. user_ask_cancel_booking'
+            />
           </Form.Item>
 
           <Form.Item
