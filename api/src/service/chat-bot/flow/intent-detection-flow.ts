@@ -47,7 +47,7 @@ export const intentDetectionFlow = async (
     ===============
     Guidelines:
       - Note: 'Intent configurations' in 'Context' is my predefined intent configuration, 'Intent name' is the name of the intent, 'intent required fields' is the required fields to be extracted from the user's question. Note, some intents do not have intent required fields'.
-      - Analyze current user's question from 'Current user's question' in 'Context' to determine which intent from the intent configurations it matches most closely. User questions may contain multiple intents, so you need analyze whether it contains multiple intents.
+      - Analyze the user's current message in combination with the previous message to determine the intent it matches most closely from 'Intent configurations'. User queries may involve multiple intents, so assess if multiple intents are present.
       - Return the result as an Array data type, and this array includes JSON objects. The output format must be:
         {
           result: [

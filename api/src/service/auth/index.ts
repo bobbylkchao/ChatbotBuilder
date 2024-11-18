@@ -3,8 +3,11 @@ import { User } from '@prisma/client'
 import { GraphQLError } from 'graphql'
 import logger from '../../misc/logger'
 import { getUser, createUser } from '../database/user'
+import { OAuth2Client } from 'google-auth-library'
 
-const unAuthenticatedError = new GraphQLError('User is not authenticated', {
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+
+const unAuthenticatedError = new GraphQLError('Login has expired', {
   extensions: {
     code: 'UNAUTHENTICATED',
     http: { status: 401 },
@@ -31,24 +34,26 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
     let openId = ''
     let email = ''
     let name = ''
+
     // local development via Apollo Studio
     if (authToken === 'development' && process.env.ENVIRONMENT === 'local') {
       openId = '0000'
       email = 'apollo-studio-test@blueprintai.ca'
     } else {
-      const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: {
-          Authorization: authToken,
-        },
+      const ticket = await client.verifyIdToken({
+        idToken: authToken.replace('Bearer ', ''),
+        audience: process.env.GOOGLE_CLIENT_ID,
       })
-      result = response?.data
-      openId = result?.sub || ''
-      email = result?.email || ''
-      name = result?.name || ''
+
+      const payload = ticket.getPayload()
+      openId = payload?.sub || ''
+      email = payload?.email || ''
+      name = payload?.name || ''
     }
-    
+
     if (openId && email) {
       let user = await getUser(openId, email)
+
       if (!user) {
         user = await createUser({
           openid: openId,
@@ -56,15 +61,16 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
           name,
         })
       }
-      
-      if (!user) {
-        if (source === 'graphql') {
-          throw unAuthenticatedError
-        }
-        return null
+
+      if (user) {
+        return user
       }
 
-      return user
+      if (source === 'graphql') {
+        throw unAuthenticatedError
+      }
+
+      return null
     } else {
       logger.error('openId or email is null')
       if (source === 'graphql') {
@@ -74,6 +80,7 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
 
     return null
   } catch (error) {
+    logger.error(`Authentication error: ${error}`)
     if (source === 'graphql') {
       throw unAuthenticatedError
     }

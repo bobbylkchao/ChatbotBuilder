@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useGoogleLogin } from '@react-oauth/google'
+import { GoogleLogin } from '@react-oauth/google'
 import { useLazyQuery } from '@apollo/client'
 import { useNavigate, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -10,36 +10,28 @@ import { Button } from '../button/styled'
 import { IUser } from '../../context/type'
 
 const GoogleSignIn = (): React.ReactElement => {
-  const accessTokenInSessionStorage = sessionStorage.getItem('authorizationToken')
+  const tokenInSessionStorage = sessionStorage.getItem('authorizationToken')
   const { user, setUser } = useGlobalStateContext()
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
   const [verifySignIn, { called, loading, data, error }] = useLazyQuery(signInQuery)
   const navigate = useNavigate()
   const location = useLocation()
 
-  const login = useGoogleLogin({
-    onSuccess: tokenResponse => {
-      setAccessToken(`${tokenResponse.token_type} ${tokenResponse.access_token}`)
-    },
-    onError: (err) => console.error(err)
-  })
-
   useEffect(() => {
-    if (accessTokenInSessionStorage) {
-      setAccessToken(accessTokenInSessionStorage)
+    if (tokenInSessionStorage) {
+      setToken(tokenInSessionStorage)
     }
-  }, [accessTokenInSessionStorage])
+  }, [tokenInSessionStorage])
 
   useEffect(() => {
     const sendApiRequest = async () => {
-      if (accessToken) {
-        setAuthorizationToken(accessToken)
+      if (token) {
+        setAuthorizationToken(token)
         await verifySignIn()
       }
     }
-
     sendApiRequest()
-  }, [accessToken, verifySignIn])
+  }, [token, verifySignIn])
 
   useEffect(() => {
     if (data?.signIn) {
@@ -71,27 +63,37 @@ const GoogleSignIn = (): React.ReactElement => {
   }, [user])
 
   useEffect(() => {
-    if (error) {
-      toast.error(error.message)
-      sessionStorage.setItem('authorizationToken', '')
-    }
-  }, [error])
+    console.log('loading', loading)
+  }, [loading])
 
-  if (!called || error) {
-    return (
-      <Button
-        onClick={() => login()}
-        style={{marginTop: '20px'}}
-      >Sign in with Google 🚀</Button>
-    )
-  }
-
-  if ((called && loading) || data) {
+  if (loading) {
     return <Button
       style={{marginTop: '20px'}}
     >Logging in...</Button>
   }
   
+  if (!loading || error) {
+    return (
+      <GoogleLogin
+        onError={() => toast.error('Login Failed')}
+        onSuccess={(response) => {
+          if (response.credential) {
+            setToken(response.credential)
+          } else {
+            toast.error('Login Failed')
+          }
+        }}
+        theme='outline'
+        text='signin_with'
+        containerProps={{
+          style: {
+            marginTop: 20,
+          },
+        }}
+      />
+    )
+  }
+
   return <></>
 }
 

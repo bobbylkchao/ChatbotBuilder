@@ -130,7 +130,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
               {
                 id: submitCreateBotHandlerResult.createBot.id,
                 name: formBotName,
-                guidelines: formGreetingMessage,
+                guidelines: formGuidelines,
                 botIntents: [],
                 greetingMessage: formGreetingMessage,
                 allowedOrigin: formatAllowedOrigin,

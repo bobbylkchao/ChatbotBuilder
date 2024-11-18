@@ -21,7 +21,7 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: sessionStorage.getItem('authorizationToken') || '',
+      authorization: `Bearer ${sessionStorage.getItem('authorizationToken') || ''}`,
     }
   }
 })

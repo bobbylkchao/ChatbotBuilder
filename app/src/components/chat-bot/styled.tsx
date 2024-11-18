@@ -33,6 +33,10 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
     display: flex;
     flex-direction: column;
     max-width: 80%;
+
+    @media (max-width: 768px) {
+      max-width: 100%;
+    }
   }
 
   p.timestamp {
@@ -85,7 +89,6 @@ export const MessageItem = styled.div<{ role: 'system' | 'user' | 'assistant' }>
     }
 
     img {
-      width: auto;
       max-width: 100%;
       border-radius: 10px;
     }
@@ -168,6 +171,7 @@ export const QuickActionItem = styled.button`
   color: ${themeConfig.primary};
   box-shadow: rgba(0, 0, 0, 0.03) 0px -1px 0px 0px, rgba(0, 0, 0, 0.24) 0px 0px 1px 0px, rgba(0, 0, 0, 0.16) 0px 2px 1px -1px, rgba(0, 0, 0, 0.12) 0px 2px 4px 0px;
   margin-right: 10px;
+  margin-bottom: 10px;
 
   &:hover {
     background-color: rgb(237, 240, 243);
