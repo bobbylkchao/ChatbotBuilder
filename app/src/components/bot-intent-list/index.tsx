@@ -158,39 +158,43 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
   return (
     <>
       <ButtonContainer>
-        <StrictIntentDetectionContainer>
-          <Space direction="horizontal" align="center">
-            <span>
-              Strict Intent Detection
-            </span>
-            <Tooltip placement="top" title={<p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry I can't answer this question”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>}>
-              <Switch
-                loading={updateBotStrictIntentDetectionHandlerLoading}
-                checkedChildren="Enabled"
-                unCheckedChildren="Disabled"
-                value={user?.userBots?.find(bot => bot.id === botId)?.strictIntentDetection}
-                onClick={(_, event) => event.stopPropagation()}
-                onChange={async (value) => {
-                  try {
-                    await updateBotStrictIntentDetectionHandler({
-                      variables: {
-                        botId,
-                        strictIntentDetection: value,
-                      },
-                    })
-                  } catch (err: any) {
-                    console.error(err)
-                    const errorMessage = err?.graphQLErrors?.[0]?.message || 
-                      err?.networkError?.message || 
-                      `Strict intent detection update failed!`
-                    toast.error(errorMessage)
-                  }
-                }}
-              />
-            </Tooltip>
-            <QuestionCircleOutlined onClick={() => setIsStrictIntentDetectionModalOpen(true)} title="Tips" />
-          </Space>
-        </StrictIntentDetectionContainer>
+        {
+          dataSource.length > 0 && (
+            <StrictIntentDetectionContainer>
+              <Space direction="horizontal" align="center">
+                <span>
+                  Strict Intent Detection
+                </span>
+                <Tooltip placement="top" title={<p>When <i><b>strict_intent_detection</b></i> is enabled, if the user's question does not meet any of the intent, the chatbot will not be allowed to answer freely, but will return something like “Sorry I can't answer this question”. Because sometimes we want the chatbot to be controllable and only answer questions with the configured intent.</p>}>
+                  <Switch
+                    loading={updateBotStrictIntentDetectionHandlerLoading}
+                    checkedChildren="Enabled"
+                    unCheckedChildren="Disabled"
+                    value={user?.userBots?.find(bot => bot.id === botId)?.strictIntentDetection}
+                    onClick={(_, event) => event.stopPropagation()}
+                    onChange={async (value) => {
+                      try {
+                        await updateBotStrictIntentDetectionHandler({
+                          variables: {
+                            botId,
+                            strictIntentDetection: value,
+                          },
+                        })
+                      } catch (err: any) {
+                        console.error(err)
+                        const errorMessage = err?.graphQLErrors?.[0]?.message || 
+                          err?.networkError?.message || 
+                          `Strict intent detection update failed!`
+                        toast.error(errorMessage)
+                      }
+                    }}
+                  />
+                </Tooltip>
+                <QuestionCircleOutlined onClick={() => setIsStrictIntentDetectionModalOpen(true)} title="Tips" />
+              </Space>
+            </StrictIntentDetectionContainer>
+          )
+        }
         <CreateIntentButtonContainer>
           <Button
             type='primary'

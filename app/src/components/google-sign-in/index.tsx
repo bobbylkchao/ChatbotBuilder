@@ -62,10 +62,6 @@ const GoogleSignIn = (): React.ReactElement => {
     }
   }, [user])
 
-  useEffect(() => {
-    console.log('loading', loading)
-  }, [loading])
-
   if (loading) {
     return <Button
       style={{marginTop: '20px'}}

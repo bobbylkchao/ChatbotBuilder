@@ -25,7 +25,6 @@ const MessageItemComponent: React.FC<MessageItemComponentProps> = ({ message }) 
   const updateMessageContent = useCallback(async (newMessage: IMessage) => {
     if (newMessage.role === 'assistant' && newMessage.content !== 'loading') {
       const htmlContent = md.render(md.render(newMessage.content))
-      console.log(htmlContent)
       setContent(addTargetAttrToHyperLink(htmlContent ))
       if (newMessage?.componentItem && newMessage.componentItem.length > 0) {
         setComponents(newMessage.componentItem)
