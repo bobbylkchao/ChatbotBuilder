@@ -85,7 +85,7 @@ export const chatBotServiceEntry = async (
     requesterData: getRequesterData(req),
   })
 
-  const chatHistory = messages.map(m => `${m.role}: ${m.content}`).join('\n')
+  const chatHistory = messages.map(m => `[role: ${m.role}]: ${m.content.replace(/[\r\n]/g, ',')}`).join('\n')
 
   // If bot does not have intent config, bypass
   let intentResult: IIntentDetectionReturn

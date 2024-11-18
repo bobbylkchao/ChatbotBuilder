@@ -31,14 +31,23 @@ export const intentDetectionFlow = async (
     }
 
     const intentListFormatted = botIntents && botIntents?.length > 0 ? botIntents.map(
-      intent => `'Intent name: ${intent.name}, this intent required fields: ${intent.requiredFields || '\'\''}'.`
+      intent => {
+        if (intent.requiredFields) {
+          return `- Intent name: ${intent.name}, intent description: ${intent.name.replace(/_/g, ' ')}, this intent required fields: ${intent.requiredFields}.`
+        } else {
+          return `- Intent name: ${intent.name}, intent description: ${intent.name.replace(/_/g, ' ')}, this intent does not need required fields.`
+        }
+      }
     ).join('\n') : 'INTENT NOT CONFIGURED.'
 
     const guidelines = `
     ===============
     Context:
       Current user's question: "${userInput}".
-      Chat history: \n${chatHistory}.
+      Chat history:
+        ---History start---
+        ${chatHistory}
+        ---History End---
       Intent configurations:
         ${intentListFormatted}
     ===============
@@ -46,8 +55,8 @@ export const intentDetectionFlow = async (
       ${botGlobalGuidelines}
     ===============
     Guidelines:
-      - Note: 'Intent configurations' in 'Context' is my predefined intent configuration, 'Intent name' is the name of the intent, 'intent required fields' is the required fields to be extracted from the user's question. Note, some intents do not have intent required fields'.
-      - Analyze the user's current message in combination with the previous message to determine the intent it matches most closely from 'Intent configurations'. User queries may involve multiple intents, so assess if multiple intents are present.
+      - 'Intent configurations' in 'Context' is my predefined intent configuration, 'Intent name' is the name of the intent, 'intent required fields' is the required fields to be extracted from the user's question. Note, some intents do not have intent required fields'.
+      - Analyze the user's current message from 'Current user's question' in 'Context' to determine which intent matches from 'Intent configurations'. User queries may involve multiple intents, so assess if multiple intents are present. Use strict matching mode!
       - Return the result as an Array data type, and this array includes JSON objects. The output format must be:
         {
           result: [
@@ -70,11 +79,19 @@ export const intentDetectionFlow = async (
       - If any required parameters are missing, set 'parameters' to an empty object.
       - If the intent is not configured,  set 'intentName' to 'NULL' and 'parameters' to an empty object.
       - If intent is NOT found, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+
+      - DO NOT force intent matching if you're not sure.
+      - If the user's intent is unclear, you can ask the user to clarify the question, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+
       - If user is unsure or cannot provide required parameters (e.g., “I don't have”), do not match the intent. Instead, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+
+      - DO NOT allow both INTENT_FOUND and INTENT_CONFIG_NOT_FOUND to exist in array. You only need to keep INTENT_FOUND if this happens.
+
       - Strictly follow my output format requirements and do not add additional properties.
       - Ensure that the output is array format with proper JSON objects without any escaped characters (e.g., no '\n').
     ===============
     `
+    console.log(guidelines)
 
     // Request openai api
     const request = await openAiClient.chat.completions.create(
