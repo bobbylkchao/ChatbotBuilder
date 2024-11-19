@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.1.15 (2024-11-19)
+
+
+### Bug Fixes
+
+* ts error ([c387824](https://github.com/bobbylkchao/blueprint-dev/commit/c3878245672e73f2f29d4f0ebe879e311d542dbd))
+
 ### 0.1.14 (2024-11-19)
 
 
