@@ -1,4 +1,4 @@
-import { handleUpdateIntent } from "./update-intent-handler"
+import { handleUpdateIntent } from "./update-intent"
 import { handleCreateIntent } from "./create-intent"
 import { handleDeleteIntent } from "./delete-intent"
 import { handleUpdateBot } from "./update-bot"

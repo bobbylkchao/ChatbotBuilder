@@ -13,6 +13,7 @@ export const typeDefs = gql`
     createIntent(
       botId: String!,
       name: String!,
+      description: String!,
       requiredFields: String,
       isEnabled: Boolean,
       intentHandler: IntentHandlerInput
@@ -20,6 +21,7 @@ export const typeDefs = gql`
     updateIntent(
       id: String!,
       name: String!,
+      description: String!,
       requiredFields: String,
       isEnabled: Boolean,
       intentHandler: IntentHandlerInput

@@ -30,6 +30,7 @@ export const updateIntent = async ({
   requiredFields,
   isEnabled,
   intentHandler,
+  description,
 }: IUpdateIntent): Promise<IIntentAndHandler> => {
   try {
     const findIntent = await prisma.intent.findUnique({
@@ -68,6 +69,7 @@ export const updateIntent = async ({
       },
       data: {
         name,
+        description,
         requiredFields,
         isEnabled,
         intentHandler: {
@@ -93,6 +95,7 @@ export const createIntent = async ({
   userId,
   botId,
   name,
+  description,
   requiredFields,
   isEnabled,
   intentHandler,
@@ -135,6 +138,7 @@ export const createIntent = async ({
       },
       data: {
         name,
+        description,
         requiredFields,
         isEnabled,
         botId,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import type { FormProps } from 'antd'
-import { Checkbox, Form, Input, Radio, Select, Divider, Button } from 'antd'
+import type { FormProps, TourProps } from 'antd'
+import { Checkbox, Form, Input, Radio, Select, Divider, Button, Tour } from 'antd'
 import { QuestionCircleOutlined, LoadingOutlined, BulbOutlined } from '@ant-design/icons'
 import toast from 'react-hot-toast'
 import MDEditor from '@uiw/react-md-editor'
@@ -12,7 +12,7 @@ import { useGlobalStateContext } from '../../context/global-state'
 import { themeConfig } from '../../theme/config'
 import { Container, LeftContainer, RightContainer, MarkdownEditorContainer, EditorTipsContainer } from './styled'
 import CodeEditor, { ICodeEditorRef } from '../code-editor'
-import { updateIntentHandler } from '../../misc/apollo-queries/update-intent-handler'
+import { updateIntentQuery } from '../../misc/apollo-queries/update-intent'
 import { createIntentQuery } from '../../misc/apollo-queries/create-intent'
 import { deleteIntentQuery } from '../../misc/apollo-queries/delete-intent'
 import { decodeBase64Code, encodeBase64Code } from '../../misc/convert-base64'
@@ -45,9 +45,15 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
   const [isRequiredFieldsModalOpen, setIsRequiredFieldsModalOpen] = useState<boolean>(false)
   const [isIntentHandlerTypeModalOpen, setIsIntentHandlerTypeModalOpen] = useState<boolean>(false)
   const [isEditorTipsModalOpen, setIsEditorTipsModalOpen] = useState<boolean>(false)
+  const [isIntentDescTipsModalOpen, setIsIntentDescTipsModalOpen] = useState<boolean>(false)
   const [currentIntent, setCurrentIntent] = useState<IBotIntents | undefined>(undefined)
   const codeEditorRef = useRef<ICodeEditorRef | null>(null)
   const [codeLoaded, setCodeLoaded] = useState<boolean>(false)
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(false)
+  const [tourSteps, setTourSteps] = useState<TourProps['steps'] | undefined>(undefined)
+  const tourRefIntentName = useRef(null)
+  const tourRefIntentDesc = useRef(null)
+  const tourRefIntentType = useRef(null)
   const [handlerContentMarkdown, setHandlerContentMarkdown] = useState<string>('')
   const [typeOfAction, setTypeOfAction] = useState<'create' | 'update'>('update')
   const [form] = Form.useForm()
@@ -58,7 +64,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
       loading: submitUpdateIntentHandlerLoading,
       error: submitUpdateIntentHandlerError,
     }
-  ] = useMutation(updateIntentHandler)
+  ] = useMutation(updateIntentQuery)
   const [
     submitCreateIntentHandler,
     {
@@ -78,6 +84,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
 
   // Form hook
   const formIntentName: string = Form.useWatch('name', form)
+  const formIntentDescription: string = Form.useWatch('description', form)
   const formIntentHandlerType: TBotIntentHandlerType = Form.useWatch('intentHandlerType', form)
   const formIntentHandlerContent: string = Form.useWatch('intentHandlerContent', form)
   const formIntentHandlerGuidelines: string = Form.useWatch('intentHandlerGuidelines', form)
@@ -92,6 +99,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         // create
         setTypeOfAction('create')
         form.setFieldsValue({
+          'description': '',
           'intentHandlerType': undefined,
           'intentHandlerContent': '',
           'intentHandlerGuidelines': '',
@@ -170,6 +178,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
               variables: {
                 updateIntentId: currentIntent?.id,
                 name: formIntentName,
+                description: formIntentDescription,
                 requiredFields: intentRequiredFieldsDynamic,
                 isEnabled: formIntentEnabled,
                 intentHandler: {
@@ -184,6 +193,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
               variables: {
                 botId: currentIntent?.botId,
                 name: formIntentName,
+                description: formIntentDescription,
                 requiredFields: intentRequiredFieldsDynamic,
                 isEnabled: formIntentEnabled,
                 intentHandler: {
@@ -298,6 +308,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
           botId: currentIntent?.botId || '',
           id: newIntentData.createIntent.id,
           name: formIntentName,
+          description: formIntentDescription,
           isEnabled: formIntentEnabled,
           requiredFields: formIntentRequiredFields,
           intentHandler: {
@@ -329,6 +340,34 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
   }, [
     submitCreateIntentHandlerResult,
   ])
+
+  useEffect(() => {
+    if (tourRefIntentName && tourRefIntentDesc && tourRefIntentType) {
+      setTimeout(() => {
+        if (!localStorage.getItem('isIntentDetailsTourCompleted')) {
+          setTourSteps([
+            {
+              title: 'Intent Name',
+              description: <div><p>The chatbot will analyze the user's question and match it with the intent name. It is recommended to use the 'Snake Case' naming method and follow a specific pattern for intent names, such as user_action_topic.</p><p>Examples:</p> <pre>user_ask_cancel_booking, user_need_help_with_account</pre></div>,
+              target: () => tourRefIntentName.current,
+            },
+            {
+              title: 'Intent Description',
+              description: <div><p>The 'Intent Description' serves to guide the model, ensuring it can accurately identify the most relevant intent when matching the user's query.</p><p>Example:</p> <pre>User need to cancel the booking order.</pre></div>,
+              target: () => tourRefIntentDesc.current,
+            },
+            {
+              title: 'Intent Handler Type',
+              description: <div><p>There are 4 types of intent handler: Non-functional, Functional, Component, and Model Response. Give you the most flexible way to customize the handler. <b>Read Tips to learn more</b>.</p></div>,
+              target: () => tourRefIntentType.current
+            },
+          ])
+          setIsTourOpen(true)
+          localStorage.setItem('isIntentDetailsTourCompleted', '1')
+        }
+      }, 500)
+    }
+  }, [tourRefIntentName, tourRefIntentDesc, tourRefIntentType])
 
   return (
     <Container>
@@ -372,7 +411,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
 
           <Form.Item
             label={
-              <span>Intent Name <QuestionCircleOutlined onClick={() => setIsIntentNameModalOpen(true)} title="Tips"/></span>
+              <span>Intent Name <QuestionCircleOutlined onClick={() => setIsIntentNameModalOpen(true)} title="Tips" ref={tourRefIntentName}/></span>
             }
             name='name'
             rules={[{
@@ -388,7 +427,26 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
 
           <Form.Item
             label={
-              <span>Intent Handler Type <QuestionCircleOutlined onClick={() => setIsIntentHandlerTypeModalOpen(true)} title="Tips"/></span>
+              <span>Intent Description <QuestionCircleOutlined onClick={() => setIsIntentDescTipsModalOpen(true)} title="Tips" ref={tourRefIntentDesc}/></span>
+            }
+            name='description'
+            rules={[{
+              required: true,
+              message: 'Intent description cannot be empty'
+            }]}
+          >
+            <Input
+              placeholder="eg. The user's intent is to cancel the booking order."
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span>Intent Handler Type <QuestionCircleOutlined
+                onClick={() => setIsIntentHandlerTypeModalOpen(true)}
+                title="Tips"
+                ref={tourRefIntentType}
+              /></span>
             }
             name='intentHandlerType'
             initialValue={currentIntent?.intentHandler?.type}
@@ -502,6 +560,22 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
       </Modal>
 
       <Modal
+        title='Intent Description'
+        isModalOpen={isIntentDescTipsModalOpen}
+        handleCancel={() => setIsIntentDescTipsModalOpen(false)}
+        handleOk={() => setIsIntentDescTipsModalOpen(false)}
+        disableCancelButton={true}
+      >
+        <p>The "Intent Description" serves to guide the model, ensuring it can accurately identify the most relevant intent when matching the user's query.</p>
+        <p>An example of <b>Intent Description</b>: </p>
+        <pre>
+        Example 1: User need to seek account-related help.
+        Example 2: User need to cancel the booking order.
+        Example 3: User is interested or have questions about how to run a farm.
+        </pre>
+      </Modal>
+
+      <Modal
         title='Required Fields'
         isModalOpen={isRequiredFieldsModalOpen}
         handleCancel={() => setIsRequiredFieldsModalOpen(false)}
@@ -597,6 +671,8 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         return 'Your IP is: ' + result.ip;
         </pre>
       </Modal>
+
+      <Tour open={isTourOpen} onClose={() => setIsTourOpen(false)} steps={tourSteps} />
     </Container>
   )
 })

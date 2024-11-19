@@ -8,6 +8,7 @@ export const handleCreateIntent = async (_, args, context) => {
     userId: user.id,
     botId: args.botId,
     name: args.name,
+    description: args.description,
     requiredFields: args.requiredFields,
     isEnabled: args.isEnabled,
     intentHandler: args.intentHandler,

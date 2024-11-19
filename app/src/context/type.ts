@@ -27,6 +27,7 @@ export interface IBotIntents {
   key?: string
   id?: string
   name?: string
+  description?: string
   isEnabled?: boolean
   intentHandler?: IBotIntentHandler
   createdAt?: string

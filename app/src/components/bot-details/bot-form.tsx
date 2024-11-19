@@ -13,6 +13,7 @@ import Modal from '../modal'
 import { Container } from './styled'
 import { toast } from 'react-hot-toast'
 import { LoadingContiner } from '../loading-component'
+import { sanitizeInput } from '../../misc/sanitize-input'
 
 interface IBotForm {
   botData?: IUserBots

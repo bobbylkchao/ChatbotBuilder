@@ -16,10 +16,4 @@ export const Wrapper = styled.div`
     font-size: ${themeConfig.textSize.default};
     font-family: ${themeConfig.fontFamily};
   }
-
-  button {
-    &:hover{
-      //background-color: ${themeConfig.secondary} !important;
-    }
-  }
 `

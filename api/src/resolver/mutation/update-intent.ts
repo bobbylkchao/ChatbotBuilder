@@ -9,6 +9,7 @@ export const handleUpdateIntent = async (_, args, context) => {
     userId: user.id,
     id: args.id,
     name: args.name,
+    description: args.description,
     requiredFields: args.requiredFields,
     isEnabled: args.isEnabled,
     intentHandler: args.intentHandler,

@@ -33,63 +33,118 @@ export const intentDetectionFlow = async (
     const intentListFormatted = botIntents && botIntents?.length > 0 ? botIntents.map(
       intent => {
         if (intent.requiredFields) {
-          return `- Intent name: ${intent.name}, intent description: ${intent.name.replace(/_/g, ' ')}, this intent required fields: ${intent.requiredFields}.`
+          return `- Intent name: ${intent.name}, intent description: ${intent.description || ''}, this intent required fields: ${intent.requiredFields}.`
         } else {
-          return `- Intent name: ${intent.name}, intent description: ${intent.name.replace(/_/g, ' ')}, this intent does not need required fields.`
+          return `- Intent name: ${intent.name}, intent description: ${intent.description || ''}, this intent does not need required fields.`
         }
       }
     ).join('\n') : 'INTENT NOT CONFIGURED.'
 
     const guidelines = `
-    ===============
-    Context:
-      Current user's question: "${userInput}".
-      Chat history:
-        ---History start---
-        ${chatHistory}
-        ---History End---
-      Intent configurations:
-        ${intentListFormatted}
-    ===============
-    Global Guidelines:
-      ${botGlobalGuidelines}
-    ===============
-    Guidelines:
-      - 'Intent configurations' in 'Context' is my predefined intent configuration, 'Intent name' is the name of the intent, 'intent required fields' is the required fields to be extracted from the user's question. Note, some intents do not have intent required fields'.
-      - Analyze the user's current message from 'Current user's question' in 'Context' to determine which intent matches from 'Intent configurations'. User queries may involve multiple intents, so assess if multiple intents are present. Use strict matching mode!
-      - Return the result as an Array data type, and this array includes JSON objects. The output format must be:
-        {
-          result: [
-            {
-              "intentName": "<matched_intent_name 1>",
-              "intentSummary": "<Summarize the user's intent 1>",
-              "parameters": { "requiredField1": "<actual_value_from_user>", "requiredField2": "<actual_value_from_user>" }
-            },
-            {
-              "intentName": "<matched_intent_name 2>",
-              "intentSummary": "<Summarize the user's intent 2>",
-              "parameters": { "requiredField1": "<actual_value_from_user>", "requiredField2": "<actual_value_from_user>" }
-            },
-          ]
-        }
-      - If multiple intents are involved, add multiple JSON objects to array.
-      - Summarize each user's intent and populate it to 'intentSummary' field in JSON object, data type is string, keep summary short and not too long.
-      - If an intent match is found, extract the necessary parameter fields from the user's question based on 'intentRequiredFieds' and populate the 'parameters' object. Do not use placeholders like "<value>".
-      - If intent dose not have 'intentRequiredFieds' config, set 'parameters' to an empty object.
-      - If any required parameters are missing, set 'parameters' to an empty object.
-      - If the intent is not configured,  set 'intentName' to 'NULL' and 'parameters' to an empty object.
-      - If intent is NOT found, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+===============
+[Context]:
 
-      - DO NOT force intent matching if you're not sure.
-      - If the user's intent is unclear, you can ask the user to clarify the question, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+1. Current user's question: "${userInput}".
+2. Chat history:
+---History start---
+${chatHistory}
+---History End---
+3. Intent configurations:
+---Intent configurations start---
+${intentListFormatted}
+---Intent configurations end---
 
-      - If user is unsure or cannot provide required parameters (e.g., “I don't have”), do not match the intent. Instead, set 'intentName' to 'NULL' and 'parameters' to an empty object.
+===============
+[Global Guidelines]
 
-      - DO NOT allow both INTENT_FOUND and INTENT_CONFIG_NOT_FOUND to exist in array. You only need to keep INTENT_FOUND if this happens.
+1. Intent Configurations Context:
+   - In 'Intent configurations' of 'Context,' each intent includes:
+     - Intent Name: The unique name identifying the intent.
+     - Intent Description: A detailed explanation of the intent's purpose to aid in accurate matching.
+     - Intent Required Fields: Fields that must be extracted from the user's question for proper handling. Note: Some intents may not have required fields.
 
-      - Strictly follow my output format requirements and do not add additional properties.
-      - Ensure that the output is array format with proper JSON objects without any escaped characters (e.g., no '\n').
-    ===============
+2. Intent Matching Process:
+   - Analyze the user's current message in 'Current user's question' using the provided 'Intent configurations' in 'Context'.
+   - Match the user's question to an intent only when:
+     - The question or context clearly aligns with the intent description.
+     - There is sufficient evidence to confidently identify the intent.
+   - Rely strictly on the intent description for matching. Do not make assumptions or guess based on unrelated or ambiguous keywords.
+   - If multiple intents are present, identify all relevant intents and include them in the output.
+
+3. Output Requirements:
+   - The result should be returned as an array containing JSON objects, following this strict format:
+     {
+       "result": [
+         {
+           "intentName": "<matched_intent_name_1>",
+           "intentSummary": "<short_summary_of_user_intent_1>",
+           "parameters": { "requiredField1": "<extracted_value>", "requiredField2": "<extracted_value>" }
+         },
+         {
+           "intentName": "<matched_intent_name_2>",
+           "intentSummary": "<short_summary_of_user_intent_2>",
+           "parameters": { "requiredField1": "<extracted_value>", "requiredField2": "<extracted_value>" }
+         }
+       ]
+     }
+   - Ensure that:
+     - If no intents are matched or detected, set:
+       {
+         "result": [
+           {
+             "intentName": "NULL",
+             "intentSummary": "",
+             "parameters": {}
+           }
+         ]
+       }
+     - If an intent has no required fields or required parameters are missing, set parameters to an empty object '{}'.
+     - Each matched intent includes a concise intentSummary summarizing the user's intent in one to two sentences.
+
+4. When Intent Is Unclear or Missing:
+   - If the user's question is unclear or lacks sufficient evidence, set:
+     {
+       "result": [
+         {
+           "intentName": "NULL",
+           "intentSummary": "",
+           "parameters": {}
+         }
+       ]
+     }
+   - Prompt the user to clarify their question.
+
+5. Intent Configurations and Parameter Handling:
+   - Extract required fields for each intent based on the 'Intent Required Fields' provided.
+   - Do not use placeholders like '<value>' in the output; include actual extracted values from the user's input.
+   - If the intent has no required fields, or the user cannot provide required parameters, set parameters to '{}' and do not match the intent.
+
+6. Conflicting Conditions:
+   - If an intent is found but is not configured in the system, set intentName to "NULL". Do not include both "INTENT_FOUND" and "INTENT_CONFIG_NOT_FOUND" scenarios in the output.
+
+7. Formatting Rules:
+   - Keep the JSON output strictly formatted without any escaped characters (e.g., no '\n').
+   - Do not add additional properties to the JSON objects unless explicitly instructed.
+
+8. Edge Cases:
+   - If no intent configurations match or the intent is unknown, the response should only include:
+     {
+       "result": [
+         {
+           "intentName": "NULL",
+           "intentSummary": "",
+           "parameters": {}
+         }
+       ]
+     }
+   - For ambiguous user input, ask for clarification but ensure the output follows the same format.
+
+9. Strict Compliance:
+   - Always prioritize accuracy and clarity in intent matching.
+   - Avoid overfitting user queries to intents without clear alignment with intent descriptions.
+   - The output must adhere strictly to the prescribed format to ensure consistency across responses.
+
+===============
     `
     console.log(guidelines)
 

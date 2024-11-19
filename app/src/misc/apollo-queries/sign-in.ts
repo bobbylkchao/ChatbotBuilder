@@ -16,6 +16,7 @@ export const signInQuery = gql`
         guidelines
         botIntents {
           name
+          description
           isEnabled
           intentHandler {
             id

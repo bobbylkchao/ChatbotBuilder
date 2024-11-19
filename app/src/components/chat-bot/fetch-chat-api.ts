@@ -5,6 +5,7 @@ export const fetchChatApi = async (botId: string, requestPayload: string): Promi
       headers: {
         'Content-Type': 'application/json',
         'Authorization': sessionStorage.getItem('authorizationToken') || '',
+        'Accept': 'text/event-stream',
       },
       body: requestPayload,
     })

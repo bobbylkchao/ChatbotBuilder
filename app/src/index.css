@@ -12,3 +12,20 @@ code {
     monospace;
 }
 
+.ant-tour-description pre {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #f6f6f6;
+  color: #001833;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-y: auto;
+  font-family: Menlo, Consolas, Monaco, "Courier New", monospace;
+  font-size: 14px;
+  
+  code {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}
