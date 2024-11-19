@@ -16,6 +16,7 @@ export const quickActionConfig = `[{"key":0,"displayName":"🏠 Buy a farm","pro
 export const intentSeed: Prisma.IntentUncheckedCreateWithoutBotIntentInput[] = [
   {
     name: 'user_ask_buy_a_farm',
+    description: 'User is interested or have questions about how to run a farm.',
     isEnabled: true,
     intentHandler: {
       create: {
@@ -31,6 +32,7 @@ Howdy, y'all! Look no further for the best darn farm broker in North America—i
   },
   {
     name: 'user_ask_buy_cows',
+    description: 'User is interested or have questions about buy some cows',
     isEnabled: true,
     intentHandler: {
       create: {
@@ -54,6 +56,7 @@ test@test.com
   },
   {
     name: 'user_ask_run_a_farm',
+    description: 'User is interested or have questions about how to run a farm.',
     isEnabled: true,
     requiredFields: 'cityName',
     intentHandler: {
