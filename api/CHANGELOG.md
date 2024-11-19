@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.1.0 (2024-11-19)
+
+
+### Features
+
+* add_intent_description field ([308adfc](https://github.com/bobbylkchao/blueprint-dev/commit/308adfcc7eb84e0e5cc29a6f19239f1b6867856b))
+
 ### 1.0.13 (2024-11-18)
 
 
