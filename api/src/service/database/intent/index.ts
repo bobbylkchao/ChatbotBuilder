@@ -2,15 +2,17 @@ import { Prisma, Intent, IntentHandler } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
-interface IUpdateIntent extends Omit<Prisma.IntentUncheckedUpdateInput, 'id' | 'intentHandler'> {
+interface IUpdateIntent extends Omit<Prisma.IntentUncheckedUpdateInput, 'id' | 'description' | 'intentHandler'> {
   userId: string
   id: string
+  description: string
   intentHandler: Prisma.IntentHandlerUncheckedUpdateWithoutIntentHandlerInput
 }
 
-interface ICreateIntent extends Omit<Prisma.IntentUncheckedCreateInput, 'intentHandler'> {
+interface ICreateIntent extends Omit<Prisma.IntentUncheckedCreateInput, 'description' | 'intentHandler'> {
   userId: string
   botId: string
+  description: string
   intentHandler: Prisma.IntentHandlerUncheckedCreateInput
 }
 
