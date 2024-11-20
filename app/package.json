@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
@@ -36,7 +36,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --config ./eslint.config.mjs src --fix",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "version": "npx standard-version --skip.tag --skip.commit --release-as patch"
   },
   "browserslist": {
     "production": [
