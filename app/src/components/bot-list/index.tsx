@@ -51,7 +51,7 @@ const BotList = (): React.ReactElement => {
         botList.push({
           key: bot.id,
           id: bot.id,
-          botName: bot.name,
+          botName: bot.name.trim(),
           createdBy: user.email,
           createdAt: convertToLocalTime(bot.createdAt),
           updatedAt: convertToLocalTime(bot.updatedAt),

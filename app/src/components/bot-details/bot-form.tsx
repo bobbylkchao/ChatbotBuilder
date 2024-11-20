@@ -61,7 +61,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
             await submitUpdateBotHandler({
               variables: {
                 botId: botData.id,
-                botName: formBotName,
+                botName: formBotName.trim(),
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
                 allowedOrigin:  formAllowedOrigin ? formAllowedOrigin.split(',') : [],
@@ -71,7 +71,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
             // Create bot
             await submitCreateBotHandler({
               variables: {
-                botName: formBotName,
+                botName: formBotName.trim(),
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
                 allowedOrigin: formAllowedOrigin ? formAllowedOrigin.split(',') : [],
@@ -194,8 +194,8 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           name='name'
           rules={[{
             required: true,
-            pattern: /^[\p{L}\p{N}\s\-\(\)]+$/u,
-            message: 'Bot name format is incorrect!',
+            pattern: /^(?!\s)[\p{L}\p{N}\s-]+(?<!\s)$/u,
+            message: 'Only letters, numbers, spaces, and hyphens are allowed.',
           }]}
         >
           <Input

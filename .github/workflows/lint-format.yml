@@ -71,11 +71,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}  # Checkout the branch from the pull request
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          
+          # Check if there are any changes to commit
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          
           git add .
           git commit -m "chore: format code with prettier"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git ${{ github.head_ref }}
+          
+          # Determine whether we're pushing to the PR branch or master
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # If it's a PR, push to the PR branch
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git ${{ github.head_ref }}
+          else
+            # If it's a merge, push to master
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git master
+          fi
