@@ -11,44 +11,37 @@ export const typeDefs = gql`
   }
   type Mutation {
     createIntent(
-      botId: String!,
-      name: String!,
-      description: String!,
-      requiredFields: String,
-      isEnabled: Boolean,
+      botId: String!
+      name: String!
+      description: String!
+      requiredFields: String
+      isEnabled: Boolean
       intentHandler: IntentHandlerInput
     ): Intent!
     updateIntent(
-      id: String!,
-      name: String!,
-      description: String!,
-      requiredFields: String,
-      isEnabled: Boolean,
+      id: String!
+      name: String!
+      description: String!
+      requiredFields: String
+      isEnabled: Boolean
       intentHandler: IntentHandlerInput
     ): Intent!
-    deleteIntent(
-      intentId: String!
-    ): Boolean!
+    deleteIntent(intentId: String!): Boolean!
     updateBot(
-      botId: String!,
-      botName: String!,
-      greetingMessage: String!,
-      guidelines: String,
-      allowedOrigin: [String],
+      botId: String!
+      botName: String!
+      greetingMessage: String!
+      guidelines: String
+      allowedOrigin: [String]
     ): Bot!
     createBot(
-      botName: String!,
-      greetingMessage: String!,
-      guidelines: String,
-      allowedOrigin: [String],
+      botName: String!
+      greetingMessage: String!
+      guidelines: String
+      allowedOrigin: [String]
     ): Bot
-    deleteBot(
-      botId: String!
-    ): String
-    createQuickAction(
-      botId: String!
-      config: String!
-    ): QuickAction
+    deleteBot(botId: String!): String
+    createQuickAction(botId: String!, config: String!): QuickAction
     updateBotStrictIntentDetection(
       botId: String!
       strictIntentDetection: Boolean!

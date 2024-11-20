@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useRef } from "react"
-import { Table, Space, Button, Popconfirm, Tour, Tooltip } from "antd"
-import { PlusOutlined, SettingOutlined, CloseOutlined, LoadingOutlined, ExportOutlined } from "@ant-design/icons"
+import React, { useState, useEffect, useRef } from 'react'
+import { Table, Space, Button, Popconfirm, Tour, Tooltip } from 'antd'
+import { PlusOutlined, SettingOutlined, CloseOutlined, LoadingOutlined, ExportOutlined } from '@ant-design/icons'
 import type { TableProps, TourProps } from 'antd'
-import { useNavigate } from "react-router-dom"
-import { useMutation } from "@apollo/client"
-import { useGlobalStateContext } from "../../context/global-state"
-import { convertToLocalTime } from "../../misc/convert-to-local-time"
-import { themeConfig } from "../../theme/config"
-import { Container, ButtonContainer } from "./styled"
-import { HeaderH2 } from "../header/styled"
-import { Divider } from "../divider"
-import Modal from "../modal"
-import BotForm, { IBotFormRef } from "../bot-details/bot-form"
-import { deleteBotQuery } from "../../misc/apollo-queries/delete-bot"
-import { LoadingContiner } from "../loading-component"
+import { useNavigate } from 'react-router-dom'
+import { useMutation } from '@apollo/client'
+import { useGlobalStateContext } from '../../context/global-state'
+import { convertToLocalTime } from '../../misc/convert-to-local-time'
+import { themeConfig } from '../../theme/config'
+import { Container, ButtonContainer } from './styled'
+import { HeaderH2 } from '../header/styled'
+import { Divider } from '../divider'
+import Modal from '../modal'
+import BotForm, { IBotFormRef } from '../bot-details/bot-form'
+import { deleteBotQuery } from '../../misc/apollo-queries/delete-bot'
+import { LoadingContiner } from '../loading-component'
 import { toast } from 'react-hot-toast'
-import { gaSendClickEvent } from "../../misc/google-analytics"
+import { gaSendClickEvent } from '../../misc/google-analytics'
 
 interface IDataType {
   key: string
@@ -41,7 +41,6 @@ const BotList = (): React.ReactElement => {
     {
       data: submitDeleteBotHandlerResult,
       loading: submitDeleteBotHandlerLoading,
-      error: submitDeleteBotHandlerError,
     }
   ] = useMutation(deleteBotQuery)
 
@@ -144,7 +143,7 @@ const BotList = (): React.ReactElement => {
           <a
             href={`/chat/${record.id}`}
             target='_blank'
-            ref={tourRefPublicUrl}
+            ref={tourRefPublicUrl} rel="noreferrer"
           ><ExportOutlined /></a>
         </Tooltip>
       ),

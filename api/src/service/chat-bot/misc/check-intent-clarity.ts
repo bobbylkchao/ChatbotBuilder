@@ -1,5 +1,5 @@
-import { openAiClient, getModel } from "../../open-ai"
-import logger from "../../../misc/logger"
+import { openAiClient, getModel } from '../../open-ai'
+import logger from '../../../misc/logger'
 
 interface ICheckIntentClarityReturn {
   isIntentClear: boolean
@@ -8,7 +8,7 @@ interface ICheckIntentClarityReturn {
 
 export const checkIntentClarity = async (
   botGlobalGuidelines: string,
-  chatHistory: string,
+  chatHistory: string
 ): Promise<ICheckIntentClarityReturn> => {
   const guidelines = `
   ===============
@@ -31,21 +31,19 @@ export const checkIntentClarity = async (
   ===============
   `
 
-  const request = await openAiClient.chat.completions.create(
-    {
-      model: getModel(),
-      messages: [
-        {
-          role: 'system',
-          content: guidelines,
-        }
-      ],
-      stream: false,
-      response_format: {
-        type: 'json_object',
+  const request = await openAiClient.chat.completions.create({
+    model: getModel(),
+    messages: [
+      {
+        role: 'system',
+        content: guidelines,
       },
+    ],
+    stream: false,
+    response_format: {
+      type: 'json_object',
     },
-  )
+  })
 
   let reponseData = request?.choices?.[0]?.message?.content
 
@@ -54,7 +52,7 @@ export const checkIntentClarity = async (
     try {
       reponseData = JSON.parse(reponseData)
     } catch (err) {
-      logger.error({ reponseData }, 'Intent clarity response parse failed')
+      logger.error({ reponseData, err }, 'Intent clarity response parse failed')
     }
   }
 

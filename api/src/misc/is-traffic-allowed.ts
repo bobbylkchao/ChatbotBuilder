@@ -1,4 +1,4 @@
-import { getDomainFromUrl } from "./get-domain"
+import { getDomainFromUrl } from './get-domain'
 
 interface IIsTrafficAllowedReturn {
   isAllowed: boolean
@@ -10,22 +10,24 @@ export const isTrafficAllowed = (
   apiHost: string,
   authToken: string
 ): IIsTrafficAllowedReturn => {
-  const isNonProdApolloStudio = process.env.ENVIRONMENT === 'local' && origin === `http://localhost:${process.env.PORT || 4000}`
+  const isNonProdApolloStudio =
+    process.env.ENVIRONMENT === 'local' &&
+    origin === `http://localhost:${process.env.PORT || 4000}`
   if (authToken && !authToken.startsWith('Bearer ')) {
     return {
       isAllowed: false,
-      authToken: null
+      authToken: null,
     }
   }
 
   if (!authToken && isNonProdApolloStudio) {
     return {
       isAllowed: true,
-      authToken: 'development'
+      authToken: 'development',
     }
   }
 
-  if (authToken && (getDomainFromUrl(origin) === getDomainFromUrl(apiHost))) {
+  if (authToken && getDomainFromUrl(origin) === getDomainFromUrl(apiHost)) {
     return {
       isAllowed: true,
       authToken: authToken,

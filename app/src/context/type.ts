@@ -11,7 +11,11 @@ export interface IUser {
   userBots?: IUserBots[]
 }
 
-export type TBotIntentHandlerType = "NONFUNCTIONAL" | "FUNCTIONAL" | "COMPONENT" | "MODELRESPONSE"
+export type TBotIntentHandlerType =
+  | 'NONFUNCTIONAL'
+  | 'FUNCTIONAL'
+  | 'COMPONENT'
+  | 'MODELRESPONSE'
 
 export interface IBotIntentHandler {
   id: string
@@ -53,7 +57,7 @@ export interface IUserBots {
   greetingMessage: string
   strictIntentDetection?: boolean
   botQuickActions?: IBotQuickAction
-}[]
+}
 
 export interface IUseGlobalStateContext {
   user: IUser | null

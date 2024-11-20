@@ -7,23 +7,13 @@ import {
   InputField,
   SubmitMessageButton,
 } from './styled'
-import { IMessage, IChatStreamReturn } from './types'
-import MessageItemComponent from './message-item-component'
-import LoadingAnimation from '../loading-animation'
-import { convertStringToJson } from '../../misc/convert-string-to-json'
+import { IMessage } from './types'
 import { fetchChatApi } from './fetch-chat-api'
-import QuickActions from './quick-actions'
 import { toast } from 'react-hot-toast'
 import MessageComponent from './message-component'
 
 interface IArgs {
   botId: string
-}
-
-const initMessage: IMessage = {
-  role: 'system',
-  content: `Hi, I'm your virtual assistant! How can I help you today?`,
-  timestamp: new Date(),
 }
 
 const MESSAGE_FILTER_REGEX = /MESSAGE_START\|([\s\S]*?)\|MESSAGE_END/g
@@ -134,7 +124,7 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
             return
           }
   
-          let chunkString = decoder.decode(value)
+          const chunkString = decoder.decode(value)
           assistantContent += chunkString
           readChunk()
         }
@@ -200,7 +190,7 @@ const ChatBot = ({ botId }: IArgs): React.ReactElement => {
 
         let chunkString = decoder.decode(value)
         chunkString = chunkString.replace(/ +/g, ' ')
-        chunkString = chunkString.replace(/\s*'\s*/g, "'")
+        chunkString = chunkString.replace(/\s*'\s*/g, '\'')
         chunkString = chunkString.replace(/`/g, '')
         assistantContent += chunkString
         readChunk()

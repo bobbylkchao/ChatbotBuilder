@@ -1,8 +1,6 @@
-import { Response } from "express"
-import { openAiClient, getModel } from "../../open-ai"
-import { IIntentHandlerFlow } from "./intent-handler-flow"
-import { MESSAGE_START, MESSAGE_END } from "../misc/message-response-format"
-import { IMessage, TBotData } from "../type"
+import { Response } from 'express'
+import { openAiClient, getModel } from '../../open-ai'
+import { MESSAGE_START, MESSAGE_END } from '../misc/message-response-format'
 
 interface IModelResponseFlow {
   userInput: string
@@ -19,10 +17,10 @@ export const modelResponseFlow = async ({
   intentHandlerGuidelines,
   res,
 }: IModelResponseFlow) => {
-  const stream = await openAiClient.chat.completions.create(
-    {
-      model: getModel(),
-      messages: [{
+  const stream = await openAiClient.chat.completions.create({
+    model: getModel(),
+    messages: [
+      {
         role: 'system',
         content: `
         ===============
@@ -39,15 +37,15 @@ export const modelResponseFlow = async ({
         ===============
         What you need to do:
           - Please answer the user's current question based on the Context and Guidelines.
-        `
-      }],
-      stream: true,
-    },
-  )
+        `,
+      },
+    ],
+    stream: true,
+  })
 
   res.write(MESSAGE_START)
   for await (const chunk of stream) {
-    const content = chunk?.choices[0]?.delta?.content || ""
+    const content = chunk?.choices[0]?.delta?.content || ''
     res.write(content)
   }
   res.write(MESSAGE_END)

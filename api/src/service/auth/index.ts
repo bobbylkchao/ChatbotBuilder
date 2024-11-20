@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { User } from '@prisma/client'
 import { GraphQLError } from 'graphql'
 import logger from '../../misc/logger'
@@ -11,18 +10,15 @@ const unAuthenticatedError = new GraphQLError('Login has expired', {
   extensions: {
     code: 'UNAUTHENTICATED',
     http: { status: 401 },
-  }
+  },
 })
 
 type TAuthReturn = Promise<User | null>
 
-interface IGoogleReturn {
-  sub?: string
-  email?: string
-  name?: string
-}
-
-export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuthReturn => {
+export const auth = async (
+  authToken: string,
+  source: 'rest' | 'graphql'
+): TAuthReturn => {
   try {
     if (!authToken) {
       if (source === 'graphql') {
@@ -30,7 +26,6 @@ export const auth = async (authToken: string, source: 'rest' | 'graphql'): TAuth
       }
     }
 
-    let result: IGoogleReturn = {}
     let openId = ''
     let email = ''
     let name = ''

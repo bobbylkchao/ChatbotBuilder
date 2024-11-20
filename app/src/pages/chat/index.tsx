@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { BotContainer } from './styled'
 import ChatBot from '../../components/chat-bot'

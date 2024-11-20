@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from 'styled-components'
 
 export const Dot = styled.div<{ color: string }>`
   background-color: ${(props) => props.color};

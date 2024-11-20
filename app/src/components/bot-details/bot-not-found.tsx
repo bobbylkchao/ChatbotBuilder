@@ -1,6 +1,6 @@
-import React from "react"
-import { RobotOutlined } from "@ant-design/icons"
-import { NotFoundContainer } from "./styled"
+import React from 'react'
+import { RobotOutlined } from '@ant-design/icons'
+import { NotFoundContainer } from './styled'
 
 const BotNotFound = () => {
   return (

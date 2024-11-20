@@ -1,8 +1,8 @@
-import React from "react"
-import { Wrapper } from "../../components/wrapper/styled"
-import { HeaderH1, HeaderH2 } from "../../components/header/styled"
-import GoogleSignIn from "../../components/google-sign-in"
-import { SignInContainer } from "./styled"
+import React from 'react'
+import { Wrapper } from '../../components/wrapper/styled'
+import { HeaderH1, HeaderH2 } from '../../components/header/styled'
+import GoogleSignIn from '../../components/google-sign-in'
+import { SignInContainer } from './styled'
 
 const SignInPage = (): React.ReactElement => {
   document.title = process.env.REACT_APP_APP_NAME || ''

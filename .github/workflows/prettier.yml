@@ -1,0 +1,84 @@
+name: CI - Prettier Format
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Ensure branch is a pull request targeting master
+        id: check
+        run: |
+          if [ "${{ github.head_ref }}" == "" ]; then
+            echo "This workflow can only be run on pull requests targeting master."
+            echo "should_run=false" >> $GITHUB_ENV
+            exit 1
+          fi
+          echo "should_run=true" >> $GITHUB_ENV
+
+  prettier-format:
+    runs-on: ubuntu-latest
+    needs: check_branch # Ensure check_branch runs first and stops if it fails
+    if: needs.check_branch.result == 'success' # Only run if check_branch succeeded
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }} # Checkout the PR branch
+
+      - name: Set up Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for app
+        working-directory: ./app
+        run: npm install
+
+      - name: Install dependencies for api
+        working-directory: ./api
+        run: npm install
+
+      - name: Run Prettier on app
+        working-directory: ./app
+        run: npm run prettier-format -- --write
+
+      - name: Run Prettier on api
+        working-directory: ./api
+        run: npm run prettier-format -- --write
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          COMMIT_MESSAGE="chore(format): auto-format code with Prettier"
+
+          # Check if there are changes to commit
+          if [[ $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "$COMMIT_MESSAGE"
+            
+            # Check if it's a pull request creation or merging to master
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+                # If PR is merged to master, push to master
+                git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:master
+              else
+                # If it's a PR creation or update, push to the PR branch
+                git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.head_ref }}
+              fi
+            fi
+          else
+            echo "No changes to commit"
+          fi

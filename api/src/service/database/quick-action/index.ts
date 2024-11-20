@@ -1,4 +1,4 @@
-import { Prisma, QuickAction } from '@prisma/client'
+import { QuickAction } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 

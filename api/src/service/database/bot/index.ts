@@ -1,4 +1,3 @@
-import { Prisma, Bot } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
@@ -6,13 +5,13 @@ export const getBotsByUser = async (userId: string) => {
   try {
     const bots = await prisma.bot.findMany({
       where: {
-        userId: userId
+        userId: userId,
       },
       include: {
         botIntents: {
           include: {
             intentHandler: true,
-          }
+          },
         },
       },
     })
@@ -27,7 +26,7 @@ export const getBotGuildlinesAndIntent = async (botId: string) => {
   try {
     const botData = await prisma.bot.findUnique({
       where: {
-        id: botId
+        id: botId,
       },
       include: {
         botIntents: {
@@ -36,7 +35,7 @@ export const getBotGuildlinesAndIntent = async (botId: string) => {
           },
           include: {
             intentHandler: true,
-          }
+          },
         },
         botQuickActions: true,
       },
@@ -72,13 +71,15 @@ export const updateBot = async ({
       },
     })
 
-    const findBot = botData.find(bot => bot.id === botId)
+    const findBot = botData.find((bot) => bot.id === botId)
 
     if (!findBot) {
       throw new Error('Bot not found')
     }
 
-    const isBotNameExists = botData.find(bot => bot.id !== botId && bot.name === botName)
+    const isBotNameExists = botData.find(
+      (bot) => bot.id !== botId && bot.name === botName
+    )
 
     if (isBotNameExists) {
       throw new Error('Bot name already exists')
@@ -166,7 +167,7 @@ export const deleteBot = async ({
         userId: userId,
       },
     })
-  
+
     if (!findBot) {
       throw new Error('Bot not found')
     }
@@ -218,7 +219,7 @@ export const updateBotStrictIntentDetection = async ({
     const findBot = await prisma.bot.findMany({
       where: {
         userId: userId,
-        id: botId
+        id: botId,
       },
     })
 

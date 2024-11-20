@@ -13,7 +13,7 @@ const GoogleSignIn = (): React.ReactElement => {
   const tokenInSessionStorage = sessionStorage.getItem('authorizationToken')
   const { user, setUser } = useGlobalStateContext()
   const [token, setToken] = useState<string | null>(null)
-  const [verifySignIn, { called, loading, data, error }] = useLazyQuery(signInQuery)
+  const [verifySignIn, { loading, data, error }] = useLazyQuery(signInQuery)
   const navigate = useNavigate()
   const location = useLocation()
 

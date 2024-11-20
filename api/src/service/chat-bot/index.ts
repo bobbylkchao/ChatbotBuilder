@@ -7,7 +7,10 @@ import { generalQuestionFlow } from './flow/general-question-flow'
 import { intentHandlerFlow } from './flow/intent-handler-flow'
 import { askProvideParamsFlow } from './flow/ask-provide-params-flow'
 import { checkIntentRequiredParams } from './misc/check-intent-required-params'
-import { messageResponseFormat, messageResponseFormatJson } from './misc/message-response-format'
+import {
+  messageResponseFormat,
+  messageResponseFormatJson,
+} from './misc/message-response-format'
 import { intentDetectionFlowReturnCode } from './constants'
 import { IIntentDetectionReturn } from './type'
 import { getDomainFromUrl } from '../../misc/get-domain'
@@ -24,13 +27,17 @@ export const chatBotServiceEntry = async (
   const botData = await getBotGuildlinesAndIntent(botId)
 
   if (!botData) {
-    res.write(messageResponseFormat("<span style='color: red;font-weight: bold;'>Bot not found!</span>"))
+    res.write(
+      messageResponseFormat(
+        "<span style='color: red;font-weight: bold;'>Bot not found!</span>"
+      )
+    )
     res.end()
     return
   }
 
   // If traffic comes from same domain, bypass CORS check
-  const origin = (req?.headers?.origin || req?.headers?.referer) || ''
+  const origin = req?.headers?.origin || req?.headers?.referer || ''
   const apiHost = req.get?.('Host') || ''
   let shouldDoCorsCheck = true
   if (getDomainFromUrl(origin) === getDomainFromUrl(apiHost)) {
@@ -42,11 +49,14 @@ export const chatBotServiceEntry = async (
   if (shouldDoCorsCheck && botData.allowedOrigin.length > 0) {
     const isTrafficAllowed = botData.allowedOrigin.includes(origin)
     if (!isTrafficAllowed) {
-      logger.info({
-        botId,
-        origin,
-        allowedOrigins: botData.allowedOrigin,
-      }, 'Traffic is not allowed')
+      logger.info(
+        {
+          botId,
+          origin,
+          allowedOrigins: botData.allowedOrigin,
+        },
+        'Traffic is not allowed'
+      )
       res.status(403).json({ error: 'Traffic is not allowed' })
       return
     }
@@ -55,7 +65,7 @@ export const chatBotServiceEntry = async (
   // First message and send a greeting message
   if (messages.length === 0) {
     res.write(messageResponseFormat(botData.greetingMessage))
-    
+
     // Return quick action
     if (botData.botQuickActions?.config) {
       res.write(messageResponseFormatJson(botData.botQuickActions.config))
@@ -65,16 +75,23 @@ export const chatBotServiceEntry = async (
     return
   }
 
-  const recentMessage = messages[messages.length-1] as IMessage
+  const recentMessage = messages[messages.length - 1] as IMessage
   if (recentMessage.role === 'system') {
-    res.status(400).json({ message: 'The most recent message is from system instead of user' })
-    return 
+    res
+      .status(400)
+      .json({
+        message: 'The most recent message is from system instead of user',
+      })
+    return
   }
 
-  logger.info({
-    history: messages,
-    botId,
-  }, 'Received new chat request')
+  logger.info(
+    {
+      history: messages,
+      botId,
+    },
+    'Received new chat request'
+  )
 
   sendLogsToCloudwatch({
     logMessage: 'Received new chat request',
@@ -85,7 +102,9 @@ export const chatBotServiceEntry = async (
     requesterData: getRequesterData(req),
   })
 
-  const chatHistory = messages.map(m => `[role: ${m.role}]: ${m.content.replace(/[\r\n]/g, ',')}`).join('\n')
+  const chatHistory = messages
+    .map((m) => `[role: ${m.role}]: ${m.content.replace(/[\r\n]/g, ',')}`)
+    .join('\n')
 
   // If bot does not have intent config, bypass
   let intentResult: IIntentDetectionReturn
@@ -95,35 +114,47 @@ export const chatBotServiceEntry = async (
       res,
       botData,
       chatHistory,
-      recentMessage.content,
+      recentMessage.content
     )
   } else {
     intentResult = {
-      intents: [{
-        code: intentDetectionFlowReturnCode.NO_INTENT_IS_CONFIGURED,
-        strictIntentDetection: botData.strictIntentDetection,
-        questionToUser: '',
-      }]
+      intents: [
+        {
+          code: intentDetectionFlowReturnCode.NO_INTENT_IS_CONFIGURED,
+          strictIntentDetection: botData.strictIntentDetection,
+          questionToUser: '',
+        },
+      ],
     }
   }
-  
-  logger.info({
-    recentMessage,
-    intents: intentResult,
-    botId,
-  }, 'Intent detection result')
+
+  logger.info(
+    {
+      recentMessage,
+      intents: intentResult,
+      botId,
+    },
+    'Intent detection result'
+  )
 
   // async
-  for (const intent of (intentResult?.intents || [])) {
+  for (const intent of intentResult?.intents || []) {
     // If intent is unclear
     if (intent?.code === intentDetectionFlowReturnCode.INTENT_UN_CLEAR) {
-      logger.info({
-        botId,
-        userInput: recentMessage.content,
-        questionToUser: intent?.questionToUser,
-      }, 'User intent is unclear and returning follow-up question to user')
+      logger.info(
+        {
+          botId,
+          userInput: recentMessage.content,
+          questionToUser: intent?.questionToUser,
+        },
+        'User intent is unclear and returning follow-up question to user'
+      )
 
-      res.write(messageResponseFormat(intent?.questionToUser || 'Could you please clarify your question?'))
+      res.write(
+        messageResponseFormat(
+          intent?.questionToUser || 'Could you please clarify your question?'
+        )
+      )
     }
 
     // If intent is not found from bot's intent configs in db
@@ -134,22 +165,28 @@ export const chatBotServiceEntry = async (
       if (intent?.strictIntentDetection) {
         // If 'strictIntentDetection' field in bot table is true
         // Then not execute general question flow
-        logger.info({
-          code: intent?.code,
-          botId,
-          userInput: recentMessage.content,
-          intent,
-        }, "No intent config for user's question and returned to user directly because strict intent detection is enabled")
+        logger.info(
+          {
+            code: intent?.code,
+            botId,
+            userInput: recentMessage.content,
+            intent,
+          },
+          "No intent config for user's question and returned to user directly because strict intent detection is enabled"
+        )
 
-        res.write(messageResponseFormat('Sorry I can\'t answer this question'))
+        res.write(messageResponseFormat("Sorry I can't answer this question"))
       } else {
         // Execute general question flow
-        logger.info({
-          code: intent?.code,
-          botId,
-          userInput: recentMessage,
-          intent,
-        }, "Start executing general question flow")
+        logger.info(
+          {
+            code: intent?.code,
+            botId,
+            userInput: recentMessage,
+            intent,
+          },
+          'Start executing general question flow'
+        )
 
         await generalQuestionFlow(messages, botData, res)
       }
@@ -158,39 +195,47 @@ export const chatBotServiceEntry = async (
     // If intent is found
     if (intent?.code === intentDetectionFlowReturnCode.INTENT_FOUND) {
       // Check if intent required params are all there
-      const {
-        hasMissingRequiredParams,
-        missingFields,
-        intentHandler,
-      } = checkIntentRequiredParams(botData, intent)
+      const { hasMissingRequiredParams, missingFields, intentHandler } =
+        checkIntentRequiredParams(botData, intent)
 
-      logger.info({
-        botId,
-        hasMissingRequiredParams,
-        missingFields,
-      }, 'Intent required params check result')
+      logger.info(
+        {
+          botId,
+          hasMissingRequiredParams,
+          missingFields,
+        },
+        'Intent required params check result'
+      )
 
       // If missing intent required parameters, ask user to provide
       // Execute ask provide params flow
       if (!intentHandler) {
-        throw new Error(`No intent handler associated with intent: ${intent.intentName}`)
+        throw new Error(
+          `No intent handler associated with intent: ${intent.intentName}`
+        )
       }
 
       if (hasMissingRequiredParams) {
-        logger.info({botId, missingFields}, 'Start executing ask provide params flow')
+        logger.info(
+          { botId, missingFields },
+          'Start executing ask provide params flow'
+        )
         await askProvideParamsFlow(
           recentMessage.content,
           chatHistory,
           missingFields,
-          res,
+          res
         )
       } else {
         // If all required parameters are there, then execute intent handler
         // Execute intent handler flow
-        logger.info({
-          intentHandlerId: intentHandler.id,
-          intentParameters: intent?.parameters,
-        }, 'Intent handler flow started')
+        logger.info(
+          {
+            intentHandlerId: intentHandler.id,
+            intentParameters: intent?.parameters,
+          },
+          'Intent handler flow started'
+        )
 
         await intentHandlerFlow({
           req,

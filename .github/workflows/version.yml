@@ -49,14 +49,14 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          npx standard-version --skip.tag --skip.commit
+          npx standard-version --skip.tag --skip.commit --release-as minor
 
       - name: Generate changelog for api
         working-directory: ./api
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          npx standard-version --skip.tag --skip.commit
+          npx standard-version --skip.tag --skip.commit --release-as minor
 
       - name: Commit changes
         run: |
@@ -68,6 +68,7 @@ jobs:
           git add app/CHANGELOG.md api/CHANGELOG.md
           git add app/package.json api/package.json
           
+          # Ensure the commit message contains information about the changelog
           git commit -m "chore(release): auto-generate changelog and bump version
 
           - Updated changelogs for app and api

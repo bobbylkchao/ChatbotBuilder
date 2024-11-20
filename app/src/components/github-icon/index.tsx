@@ -1,7 +1,7 @@
-import React from "react"
+import React from 'react'
 import { Link } from 'react-router-dom'
-import { GithubOutlined } from "@ant-design/icons"
-import { Wrapper } from "./styled"
+import { GithubOutlined } from '@ant-design/icons'
+import { Wrapper } from './styled'
 
 const GitHubIcon = (): React.ReactElement => {
   return (
