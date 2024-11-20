@@ -1,6 +1,6 @@
 # Blueprint AI
 
-A low-code, configurable platform for creating generative AI-based chatbots. On the platform, users can easily and quickly create chatbots for different tasks, configure guidelines, intent flows, intent handlers (include write custom code), and quick actions.
+A low-code, configurable platform for creating generative AI-based chatbots. On the platform, users can easily and quickly create chatbots for different tasks, configure guidelines, intent flows, intent handlers (include write custom code), and quick actions. Try it at https://www.blueprintai.dev/
 
 ## Development logs and thinking
 
