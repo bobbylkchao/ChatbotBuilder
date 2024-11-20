@@ -1,18 +1,17 @@
-import { Response } from "express"
-import { openAiClient, getModel } from "../../open-ai"
-import { MESSAGE_START, MESSAGE_END } from "../misc/message-response-format"
-import { IMessage, TBotData } from "../type"
+import { Response } from 'express'
+import { openAiClient, getModel } from '../../open-ai'
+import { MESSAGE_START, MESSAGE_END } from '../misc/message-response-format'
 
 export const askProvideParamsFlow = async (
   userInput: string,
   chatHistory: string,
   missingFields: string,
-  res: Response,
+  res: Response
 ) => {
-  const stream = await openAiClient.chat.completions.create(
-    {
-      model: getModel(),
-      messages: [{
+  const stream = await openAiClient.chat.completions.create({
+    model: getModel(),
+    messages: [
+      {
         role: 'system',
         content: `
         ===============
@@ -25,15 +24,15 @@ export const askProvideParamsFlow = async (
           - Your purpose is just to let the user provide the missing parameters, don't say anything irrelevant.
           - Return type should be string.
         ===============
-        `
-      }],
-      stream: true,
-    },
-  )
+        `,
+      },
+    ],
+    stream: true,
+  })
 
   res.write(MESSAGE_START)
   for await (const chunk of stream) {
-    const content = chunk?.choices[0]?.delta?.content || ""
+    const content = chunk?.choices[0]?.delta?.content || ''
     res.write(content)
   }
   res.write(MESSAGE_END)

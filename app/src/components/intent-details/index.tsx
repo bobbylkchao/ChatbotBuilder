@@ -1,15 +1,13 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react'
-import { useParams } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import type { FormProps, TourProps } from 'antd'
-import { Checkbox, Form, Input, Radio, Select, Divider, Button, Tour } from 'antd'
+import type { TourProps } from 'antd'
+import { Form, Input, Radio, Select, Divider, Button, Tour } from 'antd'
 import { QuestionCircleOutlined, LoadingOutlined, BulbOutlined } from '@ant-design/icons'
 import toast from 'react-hot-toast'
 import MDEditor from '@uiw/react-md-editor'
 import rehypeSanitize from 'rehype-sanitize'
 import { IBotIntents, TBotIntentHandlerType } from '../../context/type'
 import { useGlobalStateContext } from '../../context/global-state'
-import { themeConfig } from '../../theme/config'
 import { Container, LeftContainer, RightContainer, MarkdownEditorContainer, EditorTipsContainer } from './styled'
 import CodeEditor, { ICodeEditorRef } from '../code-editor'
 import { updateIntentQuery } from '../../misc/apollo-queries/update-intent'
@@ -25,22 +23,8 @@ export interface IIntentDetailsRef {
   setData: (intent: IBotIntents) => void,
 }
 
-const getEmptyIntentData = (botId: string): IBotIntents => {
-  return {
-    botId,
-    key: '',
-    id: '',
-    name: '',
-    requiredFields: '',
-    isEnabled: true,
-    intentHandler: undefined,
-    createdAt: undefined,
-    updatedAt: undefined,
-  }
-}
-
 const IntentDetails = forwardRef((_, ref): React.ReactElement => {
-  const { user, setUser } = useGlobalStateContext()
+  const { setUser } = useGlobalStateContext()
   const [isIntentNameModalOpen, setIsIntentNameModalOpen] = useState<boolean>(false)
   const [isRequiredFieldsModalOpen, setIsRequiredFieldsModalOpen] = useState<boolean>(false)
   const [isIntentHandlerTypeModalOpen, setIsIntentHandlerTypeModalOpen] = useState<boolean>(false)
@@ -55,7 +39,6 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
   const tourRefIntentDesc = useRef(null)
   const tourRefIntentType = useRef(null)
   const [handlerContentMarkdown, setHandlerContentMarkdown] = useState<string>('')
-  const [typeOfAction, setTypeOfAction] = useState<'create' | 'update'>('update')
   const [form] = Form.useForm()
   const [
     submitUpdateIntentHandler,
@@ -70,15 +53,12 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
     {
       data: submitCreateIntentHandlerResult,
       loading: submitCreateIntentHandlerLoading,
-      error: submitCreateIntentHandlerError,
     }
   ] = useMutation(createIntentQuery)
   const [
     submitDeleteIntentHandler,
     {
-      data: submitDeleteIntentHandlerResult,
       loading: submitDeleteIntentHandlerLoading,
-      error: submitDeleteIntentHandlerError,
     }
   ] = useMutation(deleteIntentQuery)
 
@@ -97,7 +77,6 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
       form.setFieldsValue(intent)
       if (!intent.id) {
         // create
-        setTypeOfAction('create')
         form.setFieldsValue({
           'description': '',
           'intentHandlerType': undefined,
@@ -108,7 +87,6 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         setHandlerContentMarkdown('')
       } else {
         // update
-        setTypeOfAction('update')
         form.setFieldsValue({
           'intentHandlerType': intent.intentHandler?.type,
           'intentHandlerContent': intent.intentHandler?.content,
@@ -125,7 +103,6 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
 
   useEffect(() => {
     if (!codeLoaded && formIntentHandlerType === 'FUNCTIONAL' && codeEditorRef?.current) {
-      const decodeCodeFromEditor = codeEditorRef.current.getValue()
       const currentCode = decodeBase64Code(formIntentHandlerContent)
       codeEditorRef.current.setValue(currentCode)
       setCodeLoaded(true)
@@ -165,7 +142,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
           return toast.error('Handler content cannot be empty!')
         }
 
-        let intentHandlerGuidelinesDynamic = formIntentHandlerGuidelines || ''
+        const intentHandlerGuidelinesDynamic = formIntentHandlerGuidelines || ''
         if (formIntentHandlerType === 'MODELRESPONSE') {
           if (!intentHandlerGuidelinesDynamic) {
             return toast.error('Guidelines cannot be empty!')
@@ -212,7 +189,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
           toast.error(errorMessage)
         }
       })
-      .catch(err => {
+      .catch(_ => {
         toast.error('Form validate failed')
       })
   }
@@ -591,7 +568,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         <p>These parameters will also be passed to the <i><b>Functional</b></i> handler. You can get these parameters in your code and process them with your own logic.</p>
         <p>An example of <b>how to get parameters</b> in your code: </p>
         <pre>
-          {`return \`offerNumber: \${offerNumber}, email: \${email}\``}
+          {'return `offerNumber: ${offerNumber}, email: ${email}`'}
         </pre>
       </Modal>
 
@@ -636,7 +613,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         <p><b>Available Functions:</b></p>
         <p>The following functions are currently available in the sandbox:</p>
         <p>1. <b>request</b></p>
-        <p>Represents an Express.js Request object. You can use it to access request data, such as query parameters or body content. <a href='https://expressjs.com/en/api.html#req' target='_blank'>API Reference Documentation</a>.</p>
+        <p>Represents an Express.js Request object. You can use it to access request data, such as query parameters or body content. <a href='https://expressjs.com/en/api.html#req' target='_blank' rel="noreferrer">API Reference Documentation</a>.</p>
         <p>Example:</p>
         <pre>
           const userQuery = request.query.queryString;<br/>
@@ -646,7 +623,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         </pre>
         <Divider/>
         <p>2. <b>response</b></p>
-        <p>Represents an Express.js Response object. <a href='https://expressjs.com/en/api.html#res' target='_blank'>API Reference Documentation</a>.</p>
+        <p>Represents an Express.js Response object. <a href='https://expressjs.com/en/api.html#res' target='_blank' rel="noreferrer">API Reference Documentation</a>.</p>
         <p>Example:</p>
         <pre>
           response.locals.userName = 'bobby';
@@ -656,14 +633,14 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
         <p>This function is used to send stream messages to users. Use <code>sendMessage(message: string)</code> to send messages. Users will continue to receive messages on the frontend.</p>
         <p>Example:</p>
         <pre>
-          sendMessage('Please stay with me, I need some time to process your order...');<br/>
-          // Other logic<br/>
-          // ...<br/>
-          sendMessage('Ok, your order has been processed!');
+          {'sendMessage(\'Please stay with me, I need some time to process your order...\');'}<br/>
+          {'// Other logic'}<br/>
+          {'// ...'}<br/>
+          {'sendMessage(\'Ok, your order has been processed!\');'}
         </pre>
         <Divider/>
         <p>4. <b>fetch</b></p>
-        <p>A standard JavaScript Fetch API for making HTTP requests. <a href='https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch' target='_blank'>Documentation</a>.</p>
+        <p>A standard JavaScript Fetch API for making HTTP requests. <a href='https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch' target='_blank' rel="noreferrer">Documentation</a>.</p>
         <p>Example:</p>
         <pre>
         const response = await fetch('https://api.ipify.org?format=json');<br/>
@@ -676,5 +653,7 @@ const IntentDetails = forwardRef((_, ref): React.ReactElement => {
     </Container>
   )
 })
+
+IntentDetails.displayName = 'IntentDetails'
 
 export default IntentDetails

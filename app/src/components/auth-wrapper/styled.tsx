@@ -1,6 +1,6 @@
-import styled from "styled-components"
-import { Wrapper } from "../wrapper/styled"
-import { themeConfig } from "../../theme/config"
+import styled from 'styled-components'
+import { Wrapper } from '../wrapper/styled'
+import { themeConfig } from '../../theme/config'
 
 export const StyledAuthWrapper = styled(Wrapper)`
   flex-direction: row;

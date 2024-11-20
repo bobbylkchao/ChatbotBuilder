@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import { QuickActionItem } from "./styled"
+import React, { useState, useEffect } from 'react'
+import { QuickActionItem } from './styled'
 
 interface IQuickActions {
   displayName: string
@@ -20,7 +20,7 @@ const QuickActions = ({ data, onSend }: IQuickActionsProps): React.ReactElement 
         const quickActionParsed: IQuickActions[] = JSON.parse(data)
         setFormatQuickAction(quickActionParsed)
       } catch (err) {
-        console.log('Parse quick action failed')
+        console.log('Parse quick action failed', err)
       }
     }
   }, [data])

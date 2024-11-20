@@ -12,4 +12,5 @@ export const initOpenAiClient = () => {
 
 // TODO: choose model https://platform.openai.com/docs/models
 // Need logic/schedule to check account balance
-export const getModel = (): string => process.env.OPENAI_MODEL || 'gpt-3.5-turbo'
+export const getModel = (): string =>
+  process.env.OPENAI_MODEL || 'gpt-3.5-turbo'

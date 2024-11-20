@@ -1,8 +1,6 @@
 import {
   DashboardOutlined,
   MessageOutlined,
-  OpenAIOutlined,
-  BulbOutlined,
   LogoutOutlined,
   RobotOutlined,
 } from '@ant-design/icons'
@@ -27,5 +25,5 @@ export const navigationConfig = [
     title: 'Logout',
     icon: LogoutOutlined,
     pageName: '',
-  }
+  },
 ]

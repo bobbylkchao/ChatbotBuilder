@@ -1,4 +1,3 @@
-import http from 'http'
 import express from 'express'
 import { config } from 'dotenv'
 import cookieParser from 'cookie-parser'
@@ -12,21 +11,24 @@ import { initOpenAiClient } from './service/open-ai'
 config()
 
 const runPrismaMigrations = () => {
-  logger.info("Running Prisma migrations...")
-  exec("PRISMA_HIDE_UPDATE_MESSAGE=true npx prisma migrate deploy", (error, stdout, stderr) => {
-    if (error) {
-      logger.error('Error running migrations')
-      logger.error(error)
-      process.exit(1)
+  logger.info('Running Prisma migrations...')
+  exec(
+    'PRISMA_HIDE_UPDATE_MESSAGE=true npx prisma migrate deploy',
+    (error, stdout, stderr) => {
+      if (error) {
+        logger.error('Error running migrations')
+        logger.error(error)
+        process.exit(1)
+      }
+      if (stderr) {
+        logger.error('Migration stderr')
+        logger.error(stderr)
+      }
+      logger.info(stdout, 'Migration completed')
+      logger.info(stdout)
+      startServices()
     }
-    if (stderr) {
-      logger.error('Migration stderr')
-      logger.error(stderr)
-    }
-    logger.info(stdout, 'Migration completed')
-    logger.info(stdout)
-    startServices()
-  })
+  )
 }
 
 const startServices = async () => {
@@ -47,7 +49,7 @@ const startServices = async () => {
   })
 }
 
-if (process.env.ENVIRONMENT === "PROD") {
+if (process.env.ENVIRONMENT === 'PROD') {
   runPrismaMigrations()
 } else {
   startServices()

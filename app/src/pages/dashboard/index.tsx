@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '../../components/button/styled'
 import { useNavigate } from 'react-router-dom'
-import { useGlobalStateContext } from '../../context/global-state'
 import AuthWrapper from '../../components/auth-wrapper'
 import { Container } from './styled'
 import { HeaderH1 } from '../../components/header/styled'

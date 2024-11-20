@@ -12,24 +12,35 @@ export const startApolloServer = async (express: Express) => {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    plugins: [process.env.ENVIRONMENT !== 'local' ? ApolloServerPluginLandingPageDisabled() : {}],
+    plugins: [
+      process.env.ENVIRONMENT !== 'local'
+        ? ApolloServerPluginLandingPageDisabled()
+        : {},
+    ],
   })
 
   await apolloServer.start()
 
   const apolloMiddleware = expressMiddleware(apolloServer, {
     context: async ({ req }: { req: any }) => {
-      const origin = (req.headers.origin || req.headers.referer) || ''
+      const origin = req.headers.origin || req.headers.referer || ''
       const apiHost = req.get?.('Host') || ''
-      let authorizationToken = req.headers.authorization || ''
-      const { isAllowed, authToken } = isTrafficAllowed(origin, apiHost, authorizationToken)
-  
+      const authorizationToken = req.headers.authorization || ''
+      const { isAllowed, authToken } = isTrafficAllowed(
+        origin,
+        apiHost,
+        authorizationToken
+      )
+
       if (!isAllowed || !authToken) {
-        logger.info({
-          origin,
-          apiHost,
-          authorizationToken,
-        }, 'User is not authenticated')
+        logger.info(
+          {
+            origin,
+            apiHost,
+            authorizationToken,
+          },
+          'User is not authenticated'
+        )
 
         throw new GraphQLError('User is not authenticated', {
           extensions: {
@@ -38,7 +49,7 @@ export const startApolloServer = async (express: Express) => {
           },
         })
       }
-  
+
       return { authToken }
     },
   }) as RequestHandler

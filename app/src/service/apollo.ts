@@ -5,14 +5,6 @@ export const setAuthorizationToken = (token: string): void => {
   sessionStorage.setItem('authorizationToken', token)
 }
 
-interface IApolloContextHeaders {
-  context: {
-    headers: {
-      authorization: string
-    }
-  }
-}
-
 const httpLink = createHttpLink({
   uri: process.env.REACT_APP_API_GRAPHQL_URL,
 })
@@ -22,7 +14,7 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       authorization: `Bearer ${sessionStorage.getItem('authorizationToken') || ''}`,
-    }
+    },
   }
 })
 

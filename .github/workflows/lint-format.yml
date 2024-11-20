@@ -1,0 +1,98 @@
+name: CI - Lint and Prettier Format
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for app
+        working-directory: ./app
+        run: npm install
+
+      - name: Install dependencies for api
+        working-directory: ./api
+        run: npm install
+
+      - name: Run lint for app
+        working-directory: ./app
+        run: npm run lint
+
+      - name: Run lint for api
+        working-directory: ./api
+        run: npm run lint
+
+  prettier-format:
+    runs-on: ubuntu-latest
+    needs: lint  # Ensure prettier-format runs after lint job completes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for app
+        working-directory: ./app
+        run: npm install
+
+      - name: Install dependencies for api
+        working-directory: ./api
+        run: npm install
+
+      - name: Run prettier-format for app
+        working-directory: ./app
+        run: npm run prettier-format
+
+      - name: Run prettier-format for api
+        working-directory: ./api
+        run: npm run prettier-format
+
+  commit-changes:
+    runs-on: ubuntu-latest
+    needs: prettier-format  # Ensure commit happens after prettier-format completes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}  # Checkout the branch from the pull request
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          
+          # Check if there are any changes to commit
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          
+          git add .
+          git commit -m "chore: format code with prettier"
+          
+          # Determine whether we're pushing to the PR branch or master
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # If it's a PR, push to the PR branch
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git ${{ github.head_ref }}
+          else
+            # If it's a merge, push to master
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/bobbylkchao/blueprint-dev.git master
+          fi

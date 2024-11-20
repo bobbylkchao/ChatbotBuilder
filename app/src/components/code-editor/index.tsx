@@ -52,4 +52,6 @@ const CodeEditor = forwardRef<ICodeEditorRef>((_, ref): React.ReactElement => {
   )
 })
 
+CodeEditor.displayName = 'CodeEditor'
+
 export default CodeEditor

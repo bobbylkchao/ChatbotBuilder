@@ -35,7 +35,7 @@ export const intentHandlerFlow = async ({
     logger.info({ intentHandlerId }, 'NONFUNCTIONAL response')
     res.write(messageResponseFormat(intentHandlerContent || ''))
   }
-  
+
   if (intentHandlerType === 'FUNCTIONAL') {
     logger.info({ intentHandlerId }, 'FUNCTIONAL response')
     // TODO: give a list about all context functions that can be used within sandbox
@@ -52,7 +52,10 @@ export const intentHandlerFlow = async ({
       sendMessage: sendMessageFunction,
       fetch: fetch,
     }
-    const decodedFunction = functionalHandler(intentHandlerContent || '', contextInSandbox)
+    const decodedFunction = functionalHandler(
+      intentHandlerContent || '',
+      contextInSandbox
+    )
 
     let sandboxResult = ''
     let errorDetails = ''
@@ -60,7 +63,10 @@ export const intentHandlerFlow = async ({
       sandboxResult = await decodedFunction()
     } catch (err: any) {
       // Explicitly return sandbox errors to the frontend, assuming developers cannot query the api logs
-      logger.error({ intentHandlerId, err }, 'Code execution in the sandbox encountered an error')
+      logger.error(
+        { intentHandlerId, err },
+        'Code execution in the sandbox encountered an error'
+      )
       sandboxResult = 'Something went wrong, please try again.'
 
       if (err?.message) {

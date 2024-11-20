@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from "react"
-import { Table, Space, Checkbox, Button, Popconfirm, Switch, Tooltip } from "antd"
-import type { TableProps, PopconfirmProps } from 'antd'
-import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons"
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { Table, Space, Button, Popconfirm, Switch, Tooltip } from 'antd'
+import type { TableProps } from 'antd'
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import toast from 'react-hot-toast'
-import { useMutation } from "@apollo/client"
-import { IBotIntents } from "../../context/type"
-import { useGlobalStateContext } from "../../context/global-state"
-import { convertToLocalTime } from "../../misc/convert-to-local-time"
-import { Dot } from "../dot/styled"
-import Modal from "../modal"
-import IntentDetails, { IIntentDetailsRef } from "../intent-details"
-import { themeConfig } from "../../theme/config"
-import { ButtonContainer, CreateIntentButtonContainer, StrictIntentDetectionContainer } from "./styled"
-import { gaSendClickEvent } from "../../misc/google-analytics"
-import { updateBotStrictIntentDetectionQuery } from "../../misc/apollo-queries/update-bot-strict-intent-detection"
+import { useMutation } from '@apollo/client'
+import { IBotIntents } from '../../context/type'
+import { useGlobalStateContext } from '../../context/global-state'
+import { convertToLocalTime } from '../../misc/convert-to-local-time'
+import { Dot } from '../dot/styled'
+import Modal from '../modal'
+import IntentDetails, { IIntentDetailsRef } from '../intent-details'
+import { themeConfig } from '../../theme/config'
+import { ButtonContainer, CreateIntentButtonContainer, StrictIntentDetectionContainer } from './styled'
+import { gaSendClickEvent } from '../../misc/google-analytics'
+import { updateBotStrictIntentDetectionQuery } from '../../misc/apollo-queries/update-bot-strict-intent-detection'
 
 interface IBotIntentListProps {
   botId: string
@@ -31,7 +31,6 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
     {
       data: updateBotStrictIntentDetectionHandlerResult,
       loading: updateBotStrictIntentDetectionHandlerLoading,
-      error: updateBotStrictIntentDetectionHandlerError,
     }
   ] = useMutation(updateBotStrictIntentDetectionQuery)
 
@@ -184,7 +183,7 @@ const BotIntentList = ({ botId }: IBotIntentListProps): React.ReactElement => {
                         console.error(err)
                         const errorMessage = err?.graphQLErrors?.[0]?.message || 
                           err?.networkError?.message || 
-                          `Strict intent detection update failed!`
+                          'Strict intent detection update failed!'
                         toast.error(errorMessage)
                       }
                     }}

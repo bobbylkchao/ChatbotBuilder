@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import React, { useState, Dispatch, SetStateAction } from 'react'
 import { useGlobalStateContext } from '../../context/global-state'
 import {
   BotSelectContainer,

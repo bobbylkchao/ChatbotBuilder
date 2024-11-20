@@ -1,5 +1,6 @@
 export const themeConfig = {
-  fontFamily: 'ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica, Apple Color Emoji, Arial, sans-serif, Segoe UI Emoji, Segoe UI Symbol',
+  fontFamily:
+    'ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica, Apple Color Emoji, Arial, sans-serif, Segoe UI Emoji, Segoe UI Symbol',
   primary: '#6a6eee',
   secondary: '#4b5beb',
   border: {

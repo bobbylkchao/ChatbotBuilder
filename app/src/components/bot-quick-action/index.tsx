@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react"
-import { Table, Space, Popover, Popconfirm, Button, Form, Input } from "antd"
-import type { TableProps, FormProps, FormInstance } from "antd"
-import { EditOutlined, CloseOutlined, PlusOutlined, LoadingOutlined, QuestionCircleOutlined } from "@ant-design/icons"
-import { useMutation } from "@apollo/client"
-import { useGlobalStateContext } from "../../context/global-state"
-import { Container, ButtonContainer } from "./styled"
-import { IBotQuickAction } from "../../context/type"
-import { Divider } from "../divider"
+import React, { useState, useEffect } from 'react'
+import { Table, Space, Popover, Popconfirm, Button, Form, Input } from 'antd'
+import type { TableProps } from 'antd'
+import { EditOutlined, CloseOutlined, PlusOutlined, LoadingOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { useMutation } from '@apollo/client'
+import { useGlobalStateContext } from '../../context/global-state'
+import { Container, ButtonContainer } from './styled'
+import { IBotQuickAction } from '../../context/type'
+import { Divider } from '../divider'
 import { toast } from 'react-hot-toast'
-import { themeConfig } from "../../theme/config"
-import { LoadingContiner } from "../loading-component"
-import { createQuickActionQuery } from "../../misc/apollo-queries/create-quick-action"
-import Modal from "../modal"
-import { gaSendClickEvent } from "../../misc/google-analytics"
+import { themeConfig } from '../../theme/config'
+import { LoadingContiner } from '../loading-component'
+import { createQuickActionQuery } from '../../misc/apollo-queries/create-quick-action'
+import Modal from '../modal'
+import { gaSendClickEvent } from '../../misc/google-analytics'
 
 interface IBotQuickActionProps {
   quickAction?: IBotQuickAction
@@ -28,7 +28,7 @@ interface IQuickActionFormat {
 
 const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickActionProps) => {
   const [dataSource, setDataSource] = useState<IQuickActionFormat[] | []>([])
-  const [currentQuickAction, setCurrentQuickAction] = useState<IQuickActionFormat | {}>({})
+  const [currentQuickAction, setCurrentQuickAction] = useState<IQuickActionFormat | object>({})
   const [modalTitle, setModalTitle] = useState<'Create' | 'Update'>('Create')
   const [isQuickActionModalOpen, setIsQuickActionModalOpen] = useState<boolean>(false)
   const { setUser } = useGlobalStateContext()
@@ -37,7 +37,6 @@ const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickAction
     {
       data: submitCreateQuickActionHandlerResult,
       loading: submitCreateQuickActionHandlerLoading,
-      error: submitCreateQuickActionHandlerError,
     }
   ] = useMutation(createQuickActionQuery)
   const [form] = Form.useForm()
@@ -145,7 +144,7 @@ const BotQuickAction = ({ botId, quickAction, toggleTipsModal }: IBotQuickAction
           toast.error(errorMessage)
         }
       })
-      .catch(err => {
+      .catch(_ => {
         toast.error('Form validate failed')
       })
   }

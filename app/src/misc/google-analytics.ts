@@ -1,4 +1,4 @@
-import ReactGA from "react-ga4"
+import ReactGA from 'react-ga4'
 
 export const initGoogleAnalytics = () => {
   if (process.env.REACT_APP_GOOGLE_GA_ID) {
@@ -9,7 +9,7 @@ export const initGoogleAnalytics = () => {
 export const gaSendPageView = (pageUrl: string, context: object) => {
   if (ReactGA.isInitialized) {
     ReactGA.send({
-      hitType: "pageview",
+      hitType: 'pageview',
       page: pageUrl,
       ...context,
     })

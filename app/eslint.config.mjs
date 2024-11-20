@@ -13,7 +13,14 @@ export default [
   {
     rules: {
       'quotes': ['error', 'single'],
+      "react/no-unescaped-entities": "off",
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': [
+      'error', {
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      },
+    ],
     },
   },
 ]

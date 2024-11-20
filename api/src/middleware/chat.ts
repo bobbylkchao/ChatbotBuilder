@@ -1,8 +1,6 @@
-import OpenAI from 'openai'
 import { RequestHandler } from 'express'
 import { param, body, validationResult } from 'express-validator'
 import logger from '../misc/logger'
-import { openAiClient, getModel } from '../service/open-ai'
 import { chatBotServiceEntry } from '../service/chat-bot'
 import { IMessage } from '../service/chat-bot/type'
 import { messageResponseFormat } from '../service/chat-bot/misc/message-response-format'
@@ -29,7 +27,9 @@ export const chatMiddleware: RequestHandler = async (req, res) => {
     await chatBotServiceEntry(botId, messages, req, res)
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
-    res.write(messageResponseFormat('Encountered an error when processing chat.'))
+    res.write(
+      messageResponseFormat('Encountered an error when processing chat.')
+    )
     res.end()
   }
 }
@@ -44,12 +44,8 @@ export const validatorHandler: RequestHandler = (req, res, next) => {
 }
 
 export const requestValidator = [
-  param('botId')
-    .isUUID()
-    .withMessage('botId must be a valid UUID'),
-  body('messages')
-    .isArray()
-    .withMessage('Messages must be an array'),
+  param('botId').isUUID().withMessage('botId must be a valid UUID'),
+  body('messages').isArray().withMessage('Messages must be an array'),
   body('messages.*.role')
     .isString()
     .withMessage('Each message must have a role as a string')

@@ -2,14 +2,22 @@ import { Prisma, Intent, IntentHandler } from '@prisma/client'
 import logger from '../../../misc/logger'
 import { prisma } from '../../../misc/prisma-client'
 
-interface IUpdateIntent extends Omit<Prisma.IntentUncheckedUpdateInput, 'id' | 'description' | 'intentHandler'> {
+interface IUpdateIntent
+  extends Omit<
+    Prisma.IntentUncheckedUpdateInput,
+    'id' | 'description' | 'intentHandler'
+  > {
   userId: string
   id: string
   description: string
   intentHandler: Prisma.IntentHandlerUncheckedUpdateWithoutIntentHandlerInput
 }
 
-interface ICreateIntent extends Omit<Prisma.IntentUncheckedCreateInput, 'description' | 'intentHandler'> {
+interface ICreateIntent
+  extends Omit<
+    Prisma.IntentUncheckedCreateInput,
+    'description' | 'intentHandler'
+  > {
   userId: string
   botId: string
   description: string
@@ -42,11 +50,11 @@ export const updateIntent = async ({
         botIntent: true,
       },
     })
-  
+
     if (!findIntent) {
       throw new Error('Intent not found')
     }
-  
+
     if (findIntent.botIntent.userId !== userId) {
       throw new Error('Bot does not belong to user')
     }
@@ -85,7 +93,7 @@ export const updateIntent = async ({
         updatedAt: new Date(),
       },
     })
-  
+
     return updateIntentQuery as IIntentAndHandler
   } catch (err) {
     logger.error(err, 'Encountered an error when updating intent')
@@ -112,12 +120,14 @@ export const createIntent = async ({
         botIntents: true,
       },
     })
-  
+
     if (!findBot) {
       throw new Error('Bot not found')
     }
 
-    const isIntentNameExist = findBot.botIntents.some(intent => intent.name === name)
+    const isIntentNameExist = findBot.botIntents.some(
+      (intent) => intent.name === name
+    )
 
     if (isIntentNameExist) {
       throw new Error('Intent name already exists')
@@ -153,7 +163,7 @@ export const createIntent = async ({
         },
       },
     })
-  
+
     return createIntentQuery as IIntentAndHandler
   } catch (err) {
     logger.error(err, 'Encountered an error when creating intent')
@@ -173,11 +183,11 @@ export const deleteIntent = async ({
         botIntent: true,
       },
     })
-  
+
     if (!findIntent) {
       throw new Error('Intent not found')
     }
-  
+
     if (findIntent.botIntent.userId !== userId) {
       throw new Error('Bot does not belong to user')
     }

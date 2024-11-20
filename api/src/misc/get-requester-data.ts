@@ -1,5 +1,5 @@
-import { Request } from "express"
-import logger from "./logger"
+import { Request } from 'express'
+import logger from './logger'
 
 export const getRequesterData = (req: Request) => {
   try {

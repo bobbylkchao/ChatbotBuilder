@@ -1,7 +1,6 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { useParams } from 'react-router-dom'
-import type { FormProps, FormInstance } from 'antd'
-import { Checkbox, Form, Input, Radio, Button, Divider } from 'antd'
+import type { FormInstance } from 'antd'
+import { Form, Input, Button, Divider } from 'antd'
 import { QuestionCircleOutlined, CheckOutlined, LoadingOutlined } from '@ant-design/icons'
 import { useMutation } from '@apollo/client'
 import { updateBotQuery } from '../../misc/apollo-queries/update-bot'
@@ -13,7 +12,6 @@ import Modal from '../modal'
 import { Container } from './styled'
 import { toast } from 'react-hot-toast'
 import { LoadingContiner } from '../loading-component'
-import { sanitizeInput } from '../../misc/sanitize-input'
 
 interface IBotForm {
   botData?: IUserBots
@@ -38,7 +36,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
     {
       data: submitUpdateBotHandlerResult,
       loading: submitUpdateBotHandlerLoading,
-      error: submitUpdateBotHandlerError,
     }
   ] = useMutation(updateBotQuery)
   const [
@@ -46,7 +43,6 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
     {
       data: submitCreateBotHandlerResult,
       loading: submitCreateBotHandlerLoading,
-      error: submitCreateBotHandlerError,
     }
   ] = useMutation(createBotQuery)
 
@@ -65,7 +61,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
             await submitUpdateBotHandler({
               variables: {
                 botId: botData.id,
-                botName: formBotName,
+                botName: formBotName.trim(),
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
                 allowedOrigin:  formAllowedOrigin ? formAllowedOrigin.split(',') : [],
@@ -75,7 +71,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
             // Create bot
             await submitCreateBotHandler({
               variables: {
-                botName: formBotName,
+                botName: formBotName.trim(),
                 greetingMessage: formGreetingMessage,
                 guidelines: formGuidelines,
                 allowedOrigin: formAllowedOrigin ? formAllowedOrigin.split(',') : [],
@@ -90,7 +86,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           toast.error(errorMessage)
         }
       })
-      .catch(err => {
+      .catch(_ => {
         toast.error('Form validate failed')
       })
   }
@@ -198,8 +194,8 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
           name='name'
           rules={[{
             required: true,
-            pattern: /^[\p{L}\p{N}\s\-\(\)]+$/u,
-            message: 'Bot name format is incorrect!',
+            pattern: /^(?!\s)[\p{L}\p{N}\s-]+(?<!\s)$/u,
+            message: 'Only letters, numbers, spaces, and hyphens are allowed.',
           }]}
         >
           <Input
@@ -324,5 +320,7 @@ const BotForm = forwardRef<IBotFormRef, IBotForm>(({ botData, extraProps }, ref)
     </Container>
   )
 })
+
+BotForm.displayName = 'BotForm'
 
 export default BotForm

@@ -1,5 +1,10 @@
-import { TBotData, IIntentDetectionFormat, IIntentConfig, IIntentHandler } from "../type"
-import logger from "../../../misc/logger"
+import {
+  TBotData,
+  IIntentDetectionFormat,
+  IIntentConfig,
+  IIntentHandler,
+} from '../type'
+import logger from '../../../misc/logger'
 
 interface ICheckIntentRequiredParamsReturn {
   hasMissingRequiredParams: boolean
@@ -12,12 +17,16 @@ export const checkIntentRequiredParams = (
   intentDetectionResult: IIntentDetectionFormat
 ): ICheckIntentRequiredParamsReturn => {
   // Get intent config
-  const getIntentConfig = botData?.botIntents?.find(intent => intent.name === intentDetectionResult.intentName) as IIntentConfig
+  const getIntentConfig = botData?.botIntents?.find(
+    (intent) => intent.name === intentDetectionResult.intentName
+  ) as IIntentConfig
   if (!getIntentConfig) {
-    logger.error(`intent: ${intentDetectionResult.intentName} not found in intents table`)
+    logger.error(
+      `intent: ${intentDetectionResult.intentName} not found in intents table`
+    )
     throw new Error(`intent: ${intentDetectionResult.intentName} not found`)
   }
-  
+
   // Check if all intent required parameters are there
   if (!getIntentConfig?.requiredFields) {
     return {
@@ -27,8 +36,13 @@ export const checkIntentRequiredParams = (
     }
   }
 
-  const intentRequireFields = getIntentConfig?.requiredFields?.replace(/\s+/g, '').replace(/,$/, '').split(',')
-  const missingFieldsString = intentRequireFields?.filter(field => !intentDetectionResult?.parameters?.[field])?.join(', ')
+  const intentRequireFields = getIntentConfig?.requiredFields
+    ?.replace(/\s+/g, '')
+    .replace(/,$/, '')
+    .split(',')
+  const missingFieldsString = intentRequireFields
+    ?.filter((field) => !intentDetectionResult?.parameters?.[field])
+    ?.join(', ')
 
   if (missingFieldsString) {
     return {

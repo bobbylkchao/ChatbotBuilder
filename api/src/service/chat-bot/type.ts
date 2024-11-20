@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EHandlerType } from '@prisma/client'
 import { getBotGuildlinesAndIntent } from '../database/bot'
 
@@ -7,7 +6,7 @@ export interface IMessage {
   content: string
 }
 
-export type THandlerType = typeof EHandlerType[keyof typeof EHandlerType]
+export type THandlerType = (typeof EHandlerType)[keyof typeof EHandlerType]
 
 export type TBotData = Awaited<ReturnType<typeof getBotGuildlinesAndIntent>>
 
@@ -32,8 +31,8 @@ export interface IIntentConfig {
 }
 
 export interface IIntentDetails {
-  intentName?: string,
-  intentSummary?: string,
+  intentName?: string
+  intentSummary?: string
   parameters?: Record<string, any>
 }
 
