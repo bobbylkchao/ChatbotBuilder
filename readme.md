@@ -20,7 +20,7 @@ For a GenAI chatbot to be effective, three key components are necessary:
 1. Handler: This component is responsible for executing the required actions based on the recognized intent.
 
 ### Main entities
-Three main entities: bot, intent, guideline and quick actions.
+Four main entities: bot, intent, guideline and quick actions.
 
 Here’s how it works:
 
