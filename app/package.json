@@ -37,7 +37,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint --config ./eslint.config.mjs src --fix",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "version": "npx standard-version --skip.tag --skip.commit --release-as minor"
+    "version": "npx standard-version --skip.tag --skip.commit --release-as patch"
   },
   "browserslist": {
     "production": [
