@@ -24,7 +24,7 @@ DB_PASSWORD=
 
 ## 4️⃣ Configure Google Sign-In
 
-Obtain your Google Sign-In Client ID and Client Secret from Google Developers Console, then update your .env file:
+Obtain your Google Sign-In Client ID and Client Secret from [Google Developers Console](https://developers.google.com/identity/sign-in/web/sign-in), then update your .env file:
 
 ```
 GOOGLE_CLIENT_ID=

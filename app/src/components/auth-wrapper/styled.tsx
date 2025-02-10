@@ -11,7 +11,8 @@ export const StyledLeftContainer = styled.div`
   flex-direction: column;
   height: 100%;
   background-color: ${themeConfig.backgroundColor.lighter};
-  width: 200px;
+  width: 250px;
+  min-width: 250px;
 `
 
 export const StyledRightContainer = styled.div`
@@ -19,6 +20,7 @@ export const StyledRightContainer = styled.div`
   flex-direction: column;
   height: 100%;
   width: 100%;
+  min-width: 800px;
   padding: 0 15px;
   background-color: #ffffff;
   color: ${themeConfig.textColor.lighter};

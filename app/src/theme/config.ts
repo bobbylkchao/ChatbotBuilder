@@ -18,6 +18,7 @@ export const themeConfig = {
     primary: '#ffffff',
     contrast: '#1f1f1f',
     lighter: '#001833',
+    xLighter: '#434550',
   },
   textSize: {
     default: '16px',

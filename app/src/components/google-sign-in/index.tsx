@@ -79,7 +79,6 @@ const GoogleSignIn = (): React.ReactElement => {
             toast.error('Login Failed')
           }
         }}
-        theme='outline'
         text='signin_with'
         containerProps={{
           style: {

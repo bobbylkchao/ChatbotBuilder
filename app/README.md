@@ -10,7 +10,7 @@ cp ./.env.example .env
 
 ## 2️⃣ Configure Google Sign-In
 
-Obtain your Google Sign-In Client ID from Google Developers Console and update the .env file:
+Obtain your Google Sign-In Client ID from [Google Developers Console](https://developers.google.com/identity/sign-in/web/sign-in) and update the .env file:
 
 ```
 REACT_APP_GOOGLE_AUTH_CLIENT_ID=''
