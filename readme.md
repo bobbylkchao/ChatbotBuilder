@@ -2,9 +2,6 @@
 
 ChatbotBuilder is an open-source, web-based chatbot creation platform built with **React.js**, **GraphQL**, and **OpenAI/DeepSeek AI models**. It allows users to design and deploy AI-powered chatbots tailored to various conversational scenarios. By defining **chat scope, guidelines, and intents**, AI models can be able to communicate with users intelligently and provide open-ended or customized responses.
 
-## Chatbot Demo
-![Chatbot Demo](/doc/images/chatbot-demo.gif)
-
 ## ✨ Highlights
 
 - **Platform-based**: Each user can create their own chatbot after logging in.
@@ -25,6 +22,31 @@ ChatbotBuilder can be used in a wide range of scenarios, such as:
 - **Immigration Consultation** – Provide guidance on visa applications, residency options, and document requirements.
 
 You can even create a companion chatbot that is just for you to chat and counsel you.
+
+## 📸 Demo
+
+### Demo 1
+
+1. Created an intent flow for specific intent.
+1. Provided guidelines to the model, allowing the model to answer freely. 
+1. Let model inject custom content into the answer.
+
+![Demo1](/doc/images/chatbot-demo-1.png)
+
+### Demo 2
+
+1. Created an intent flow for specific intent.
+1. Provided guidelines to the model, let model return a pre-defined markdown content directly.
+
+![Demo1](/doc/images/chatbot-demo-2.png)
+
+### Demo 3
+
+1. Created an intent flow for specific intent.
+1. Let the model perform interactive communication to obtain the required parameters.
+1. Provided custom logic and code to handle it, in this demo the chatbot will send a GET request to API endpoint then return to the user.
+
+![Demo1](/doc/images/chatbot-demo-3.png)
 
 ## 🛠️ System Design
 
