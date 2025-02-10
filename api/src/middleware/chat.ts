@@ -23,7 +23,11 @@ export const chatMiddleware: RequestHandler = async (req, res) => {
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
     res.write(
-      messageResponseFormat(`Encountered an error when processing chat. ${error?.message || ''}`)
+      if (error instanceof Error) {
+        messageResponseFormat(`Encountered an error when processing chat. ${error.message || ''}`);
+      } else {
+        messageResponseFormat('Encountered an unknown error');
+      }
     )
     res.end()
   }
