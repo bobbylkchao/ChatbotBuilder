@@ -22,13 +22,16 @@ export const chatMiddleware: RequestHandler = async (req, res) => {
     await chatBotServiceEntry(botId, messages, req, res)
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
-    res.write(
-      if (error instanceof Error) {
-        messageResponseFormat(`Encountered an error when processing chat. ${error.message || ''}`);
-      } else {
-        messageResponseFormat('Encountered an unknown error');
-      }
-    )
+
+    let errorMessage = '';
+
+    if (error instanceof Error) {
+      errorMessage = messageResponseFormat(`Encountered an error when processing chat. ${error.message || ''}`)
+    } else {
+      errorMessage = messageResponseFormat('Encountered an unknown error')
+    }
+
+    res.write(errorMessage)
     res.end()
   }
 }
