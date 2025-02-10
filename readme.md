@@ -23,6 +23,13 @@ ChatbotBuilder can be used in a wide range of scenarios, such as:
 
 You can even create a companion chatbot that is just for you to chat and counsel you.
 
+## Try it out
+
+Want to give it a try?
+
+- Visit [https://www.chatbotbuilder.dev](https://www.chatbotbuilder.dev/) to create and try your own chatbot.
+- Or check out the "Farm Assistant Chatbot" at [https://www.chatbotbuilder.dev/chat/e0426cc7-46e9-48c1-a1dd-374d95751cc0](https://www.chatbotbuilder.dev/chat/e0426cc7-46e9-48c1-a1dd-374d95751cc0).
+
 ## 📸 Demo
 
 ### Demo 1
