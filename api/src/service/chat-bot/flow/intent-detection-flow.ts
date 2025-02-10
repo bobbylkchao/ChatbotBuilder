@@ -169,9 +169,6 @@ ${intentListFormatted}
     response_format: {
       type: 'json_object',
     },
-  }, {
-    timeout: 5,
-    maxRetries: 3,
   })
 
   const intentResult = request.choices?.[0]?.message?.content || null

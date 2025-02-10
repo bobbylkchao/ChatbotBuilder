@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import fetch from 'node-fetch'
 import { IIntentHandler } from '../type'
 import logger from '../../../misc/logger'
 import { messageResponseFormat } from '../misc/message-response-format'
@@ -41,7 +42,6 @@ export const intentHandlerFlow = async ({
     // TODO: give a list about all context functions that can be used within sandbox
     // Pass context to inside of sandbox, the code is running in sandbox can use these context
     const sendMessageFunction = (message: string) => {
-      console.log('sendMessageFunction', message)
       res.write(messageResponseFormat(message))
     }
 

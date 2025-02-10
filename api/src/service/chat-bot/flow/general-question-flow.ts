@@ -24,9 +24,6 @@ export const generalQuestionFlow = async (
     model: getModel(),
     messages,
     stream: true,
-  }, {
-    timeout: 5,
-    maxRetries: 3,
   })
 
   res.write(MESSAGE_START)

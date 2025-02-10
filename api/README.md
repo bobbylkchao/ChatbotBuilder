@@ -1,5 +1,7 @@
 # API Setup
 
+**Require: Node > 16**
+
 ## 1️⃣ Install PostgreSQL  
 Download and install PostgreSQL from [official website](https://www.postgresql.org/download/).  
 

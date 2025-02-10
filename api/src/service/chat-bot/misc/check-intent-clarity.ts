@@ -43,12 +43,7 @@ export const checkIntentClarity = async (
     response_format: {
       type: 'json_object',
     },
-  }, {
-    timeout: 5,
-    maxRetries: 3,
   })
-
-  console.log('request', request)
 
   let reponseData = request?.choices?.[0]?.message?.content
 

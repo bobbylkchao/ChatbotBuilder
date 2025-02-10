@@ -2,6 +2,20 @@
 
 ChatbotBuilder is an open-source, web-based chatbot creation platform built with **React.js**, **GraphQL**, and **OpenAI/DeepSeek AI models**. It allows users to design and deploy AI-powered chatbots tailored to various conversational scenarios. By defining **chat scope, guidelines, and intents**, AI models can be able to communicate with users intelligently and provide open-ended or customized responses.
 
+## Chatbot Demo
+![Chatbot Demo](/doc/images/chatbot-demo.gif)
+
+## ✨ Highlights
+
+- **Platform-based**: Each user can create their own chatbot after logging in.
+- **Supports OpenAI and DeepSeek models**: Choose between OpenAI or DeepSeek for your chatbot's AI model.
+- **Customizable Guidelines and Intent Flow**: Configure guidelines and intent flow tailored to different conversation scenarios.
+- **Intent Flow Configuration**: Based on user queries, you can define different logic execution flows:
+  - **Functional Handler**: Write custom code to handle tasks such as API requests, database queries, etc.
+  - **Non-Functional Handler**: Provide non-functional responses, such as returning markdown content, formatted lists, images, etc.
+  - **Model Response Handler**: Let the model freely respond while setting guidelines to restrict certain topics or content in the answers.
+- **Shareable Chatbots**: Once created, chatbots can be shared via links and embedded in other applications.
+
 ## 🌟 Key Use Cases
 
 ChatbotBuilder can be used in a wide range of scenarios, such as:
@@ -47,36 +61,3 @@ Once configured, share the chatbot’s link with users to start engaging convers
 - **Low-code & intuitive** – Easily create AI chatbots without deep technical knowledge.
 - **Highly configurable** – Define chat behavior, restrict responses, and guide AI interactions.
 - **Flexible integrations** – Works with OpenAI, DeepSeek AI, and can be expanded with custom APIs.
-
-
-## Screenshot
-
-**Bot List**
-![Bot List](/doc/images/bot-list.png)
-
----
-
-**Bot Config**
-![Bot Config](/doc/images/bot-config.png)
-
----
-
-**Chatbot**
-![Chatbot](/doc/images/chatbot-view.png)
-
----
-
-**Intent List**
-![Intent List](/doc/images/intent-list.png)
-
----
-
-**Functional Handler**
-![Config](/doc/images/functional-handler-config.png)
-
-![Test](/doc/images/functional-handler.png)
-
----
-
-**Non-Functional Handler**
-![Test](/doc/images/non-functional-handler.png)
