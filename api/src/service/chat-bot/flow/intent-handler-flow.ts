@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import fetch from 'node-fetch'
 import { IIntentHandler } from '../type'
 import logger from '../../../misc/logger'
 import { messageResponseFormat } from '../misc/message-response-format'
@@ -45,12 +44,14 @@ export const intentHandlerFlow = async ({
       res.write(messageResponseFormat(message))
     }
 
+    const fetchFunction = (await import('node-fetch')).default
+
     const contextInSandbox = {
       ...(intentParameters || {}),
       request: req,
       response: res,
       sendMessage: sendMessageFunction,
-      fetch: fetch,
+      fetch: fetchFunction,
     }
     const decodedFunction = functionalHandler(
       intentHandlerContent || '',
