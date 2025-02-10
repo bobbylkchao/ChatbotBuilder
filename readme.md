@@ -23,7 +23,7 @@ ChatbotBuilder can be used in a wide range of scenarios, such as:
 
 You can even create a companion chatbot that is just for you to chat and counsel you.
 
-## Try it out
+## 🤖 Try it out
 
 Want to give it a try?
 
