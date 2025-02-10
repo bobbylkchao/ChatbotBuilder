@@ -93,10 +93,4 @@ export const intentHandlerFlow = async ({
       res,
     })
   }
-
-  // TODO: how to do it as the platform?
-  if (intentHandlerType === 'COMPONENT') {
-    logger.info({ intentHandlerId }, 'COMPONENT response')
-    // ...
-  }
 }

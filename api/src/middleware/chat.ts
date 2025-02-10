@@ -14,11 +14,6 @@ export const chatMiddleware: RequestHandler = async (req, res) => {
 
   const { messages }: { messages: IMessage[] } = req.body
 
-  if (!process.env.OPENAI_API_KEY) {
-    res.status(500).json({ message: 'OpenAI API key is missing' })
-    return
-  }
-
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
@@ -28,7 +23,7 @@ export const chatMiddleware: RequestHandler = async (req, res) => {
   } catch (error) {
     logger.error(error, 'Encountered an error when processing chat')
     res.write(
-      messageResponseFormat('Encountered an error when processing chat.')
+      messageResponseFormat(`Encountered an error when processing chat. ${error?.message || ''}`)
     )
     res.end()
   }

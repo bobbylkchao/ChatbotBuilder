@@ -28,6 +28,9 @@ export const askProvideParamsFlow = async (
       },
     ],
     stream: true,
+  }, {
+    timeout: 5,
+    maxRetries: 3,
   })
 
   res.write(MESSAGE_START)

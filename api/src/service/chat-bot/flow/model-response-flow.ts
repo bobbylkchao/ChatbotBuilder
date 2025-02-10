@@ -41,8 +41,10 @@ export const modelResponseFlow = async ({
       },
     ],
     stream: true,
+  }, {
+    timeout: 5,
+    maxRetries: 3,
   })
-
   res.write(MESSAGE_START)
   for await (const chunk of stream) {
     const content = chunk?.choices[0]?.delta?.content || ''
