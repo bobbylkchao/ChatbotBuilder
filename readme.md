@@ -90,3 +90,9 @@ Once configured, share the chatbot’s link with users to start engaging convers
 - **Low-code & intuitive** – Easily create AI chatbots without deep technical knowledge.
 - **Highly configurable** – Define chat behavior, restrict responses, and guide AI interactions.
 - **Flexible integrations** – Works with OpenAI, DeepSeek AI, and can be expanded with custom APIs.
+
+## ❓ Need help?
+
+Feel free to ask any questions in our slack.
+
+- [Slack Workspace](https://join.slack.com/t/aichatbotbuilder/shared_invite/zt-2tkonbsau-dzR6LWOnsN88HtKwkl1g8w)
