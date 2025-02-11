@@ -5,7 +5,7 @@ import logger from '../../misc/logger'
 export let openAiClient: OpenAI
 
 export const initOpenAiClient = () => {
-  const aiModelProvider = process.env.AI_MODEL_PROVIDER
+  const aiModelProvider = process.env.AI_MODEL
 
   let args: ClientOptions = {}
 
@@ -55,7 +55,7 @@ export const initOpenAiClient = () => {
 // TODO: choose model https://platform.openai.com/docs/models
 // Need logic/schedule to check account balance
 export const getModel = (): string => {
-  const aiModelProvider = process.env.AI_MODEL_PROVIDER
+  const aiModelProvider = process.env.AI_MODEL
   let model = ''
 
   if (aiModelProvider === 'OpenAI') {
